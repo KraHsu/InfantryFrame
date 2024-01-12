@@ -1,0 +1,20 @@
+/**
+ * @file Infantry
+ * @author CharlesHsu
+ * @date 11/6/2023
+ */
+#pragma once
+
+#define INFANTRY_ON 1
+#define INFANTRY_OFF 0
+
+#define INFANTRY_USE_SHELL INFANTRY_ON
+
+#if INFANTRY_USE_SHELL == INFANTRY_ON
+
+#define INFANTRY_SHELL_BUF_SIZE 1024
+#define INFANTRY_SHELL_UART USART1
+#define INFANTRY_CONSOLE_MEM INFANTRY_ON
+#define INFANTRY_USE_LOG INFANTRY_ON
+
+#endif
