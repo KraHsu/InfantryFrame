@@ -1,3 +1,4 @@
+# default
 /Core
 /Drivers
 /MDK-ARM
@@ -8,3 +9,127 @@
 CMakeLists.txt
 *.ioc
 .mxproject
+
+#clion
+.idea
+cmake-build-debug-stm32
+.cmsis
+
+#EIDE
+OTest.code-workspace
+
+# dot files
+.settings
+.eide
+.eide.usr.ctx.json
+
+# project out
+/build
+/bin
+/obj
+/out
+
+# eide template
+*.ept
+*.eide-template
+*.code-workspace
+
+# editor
+.vscode
+
+# CUBE Generate
+Drivers
+Middlewares
+STM32CubeIDE
+
+# editor
+.vscode
+.eide
+.EIDE
+
+# CUBE Generate
+Drivers
+Middlewares
+
+# CMSIS Extension
+.clangd
+*.yml
+*.cprj
+vcpkg-configuration.json
+out
+tmp
+
+# JLink
+JLinkSettings.ini
+JLinkLog.txt
+
+#
+RTE
+Drivers
+*.crf
+*.axf
+*.htm
+*.dep
+*.lnp
+*.sct
+*.scvd
+*.rar
+*.zip
+*.7z
+
+# Prerequisites
+*.d
+*.s
+
+# Object files
+*.o
+*.ko
+*.obj
+*.elf
+*.iex
+
+# Linker output
+*.ilk
+*.map
+*.exp
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Libraries
+*.lib
+*.a
+*.la
+*.lo
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Executables
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+*.hex
+
+# Debug files
+*.dSYM/
+*.su
+*.idb
+*.pdb
+DebugConfig
+
+# Kernel Module Compile Results
+*.mod*
+*.cmd
+.tmp_versions/
+modules.order
+Module.symvers
+Mkfile.old
+dkms.conf
+
