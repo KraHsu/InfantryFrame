@@ -13,6 +13,8 @@ namespace infantry {
 };
 
 #define delay(x) rt_thread_mdelay(x)
+#define sleep(x) DWT_Delayms(x)
+#define sleep_us(x) DWT_Delayus(x)
 #define print rt_kprintf
 
 #define EnterCritical() rt_enter_critical()
