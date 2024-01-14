@@ -143,10 +143,10 @@ FDCAN_RxHeaderTypeDef FdcanTempHeader;
 void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *phfdcan, uint32_t RxFifo0ITs) {
     if ((RxFifo0ITs & FDCAN_IT_RX_FIFO0_NEW_MESSAGE) != RESET) {
         HAL_FDCAN_GetRxMessage(phfdcan, FDCAN_RX_FIFO0, &FdcanTempHeader, FdcanTempBuffer);
-        logDebugWithTag("fdcan", "phfdcan(fdcan%d) stdid(0x%x)",
-                        phfdcan == &hfdcan1 ? 1 : (phfdcan == &hfdcan2 ? 2 : (phfdcan == &hfdcan3 ? 3 : 0)),
-                        FdcanTempHeader.Identifier
-        );
+//        logDebugWithTag("fdcan", "phfdcan(fdcan%d) stdid(0x%x)",
+//                        phfdcan == &hfdcan1 ? 1 : (phfdcan == &hfdcan2 ? 2 : (phfdcan == &hfdcan3 ? 3 : 0)),
+//                        FdcanTempHeader.Identifier
+//        );
 
         infantry::FdcanRxDataType **rxList{nullptr};
         if (phfdcan == &hfdcan1) {

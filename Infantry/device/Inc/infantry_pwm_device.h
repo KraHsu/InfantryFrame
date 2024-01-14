@@ -11,27 +11,28 @@
 
 namespace infantry {
     class PwmDevice {
+    public:
+        using StateEnum = enum {
+            STOP = false,
+            START = true
+        };
     private:
-        bool _is_running;
-        TIM_HandleTypeDef *_htim;
-        uint32_t _tim_channel;
-        uint32_t _clock;
-        uint32_t _period;
-        TIM_OC_InitTypeDef _tim_config{};
-        float _duty;
+        StateEnum _state{STOP};
+        TIM_HandleTypeDef *_htim{nullptr};
+        TIM_OC_InitTypeDef _config{};
+        uint32_t _channel{};
+        uint32_t _clock{};
         uint32_t _freq{};
+        float _duty{};
     public:
         /**
          * @brief New a pwm device
          * @param htim Tim handler
          * @param channel Tim channel
          * @param clock Pwm clock
-         * @param period Pwm period
          * @author CharlesHsu
          */
-        PwmDevice(
-                TIM_HandleTypeDef *htim, uint32_t channel, uint32_t clock = 170000000, uint32_t period = 99
-        );
+        PwmDevice(TIM_HandleTypeDef *htim, uint32_t channel, uint32_t clock);
 
         /**
          * @brief Start the pwm device
@@ -54,7 +55,7 @@ namespace infantry {
          */
         PwmDevice *setDuty(float duty);
 
-        /**
+        virtual /**
          * @brief Set frequency
          * @return this
          * @author CharlesHsu

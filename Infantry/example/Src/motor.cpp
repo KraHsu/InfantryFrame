@@ -7,7 +7,7 @@
  */
 #include "motor.h"
 
-/* PitchMotor */
+/* PositionMotor */
 namespace infantry {
     PositionMotor::PositionMotor(
             PositionMotor::RxData *rx_data, PositionMotor::TxData *tx_data, PIDController *current_pid,
@@ -58,7 +58,7 @@ namespace infantry {
     }
 }
 
-/* ChassisMotor */
+/* SpeedMotor */
 namespace infantry {
     SpeedMotor::SpeedMotor(
             SpeedMotor::RxData *rx_data, SpeedMotor::TxData *tx_data, PIDController *current_pid,
