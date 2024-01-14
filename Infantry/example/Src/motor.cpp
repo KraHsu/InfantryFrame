@@ -32,7 +32,9 @@ namespace infantry {
                 break;
         }
 
-        auto posOutput = _pid_pos->setReference(_reference).setFeedback(angleFeedback).calculate();
+        auto posOutput = _pid_pos->setReference(_reference)
+                                 .setFeedback(angleFeedback)
+                                 .calculate();
         auto spdOutput = _pid_spd->setReference(posOutput).setFeedback(rxData->_encoder.speed).calculate();
         auto output = _pid_cur->setReference(spdOutput).setFeedback(rxData->_encoder.filteredCurrent).calculate();
 

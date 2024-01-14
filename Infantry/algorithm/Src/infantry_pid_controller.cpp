@@ -41,7 +41,7 @@ namespace infantry {
     }
 
     PIDController &PIDController::setFeedback(float fdb) {
-        this->_feedback = fdb;
+        _feedback = fdb;
         return *this;
     }
 
