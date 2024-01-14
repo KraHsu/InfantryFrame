@@ -8,17 +8,18 @@
 #include "infantry_matrix.h"
 
 namespace infantry {
-    [[noreturn]] void MatrixErrorHandler() {
+    [[noreturn]] void MatrixErrorHandler(char *msg) {
+        logErrorWithTag("Matrix", "%s", msg);
         while (true) {
             //TODO: MatrixErrorHandler
         }
     }
 
-    void MatrixAssert(bool expression) {
+    void MatrixAssert(bool expression, char *msg) {
         if (!expression) {
-            MatrixErrorHandler();
+            MatrixErrorHandler(msg);
         }
-    };
+    }
 
     LogOut &operator<<(LogOut &out, const Matrix &matrix) {
         for (int i = 0; i < matrix._rows; ++i) {
@@ -160,8 +161,7 @@ namespace infantry {
             // 使对角线上的元素为1
             float diag = result(i, i);
             if (fabs(diag) < 1e-10) {
-                logErrorWithTag("Matrix", "Matrix is singular and cannot be inverted.");
-                exit(1);
+                MatrixErrorHandler("Matrix is singular and cannot be inverted.");
             }
             for (int j = 0; j < 2 * _cols; ++j) {
                 result(i, j) /= diag;

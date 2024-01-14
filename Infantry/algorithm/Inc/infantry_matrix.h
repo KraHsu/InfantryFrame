@@ -11,9 +11,9 @@
 #include "initializer_list"
 
 namespace infantry {
-    [[noreturn]] void MatrixErrorHandler();
+    [[noreturn]] void MatrixErrorHandler(char *msg);
 
-    void MatrixAssert(bool expression);
+    void MatrixAssert(bool expression, char *msg = nullptr);
 
     class Matrix {
     private:

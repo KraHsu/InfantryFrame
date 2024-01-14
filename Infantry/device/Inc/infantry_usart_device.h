@@ -45,7 +45,7 @@ namespace infantry {
 
         explicit UsartDataType(UART_HandleTypeDef *huart, uint16_t buffer_size);
 
-        virtual UsartDataType &init();
+        virtual UsartDataType *init();
 
         virtual ~UsartDataType();
     };
@@ -58,9 +58,9 @@ namespace infantry {
 
         using UsartDataType::UsartDataType;
 
-        virtual UsartDataType &rxCallback();
+        virtual UsartDataType *rxCallback();
 
-        UsartRxDataType &init() override;
+        UsartRxDataType *init() override;
     };
 
     class UsartTxDataType : public UsartDataType {
@@ -69,7 +69,7 @@ namespace infantry {
 
         using UsartDataType::UsartDataType;
 
-        virtual UsartDataType &txHook() = 0;
+        virtual UsartDataType *txHook() = 0;
     };
 
     class UsartDevice {
@@ -81,13 +81,13 @@ namespace infantry {
 
         ~UsartDevice();
 
-        UsartDevice &init();
+        virtual UsartDevice *init();
 
-        UsartDevice &registerRxCallback();
+        virtual UsartDevice *registerRxCallback();
 
-        UsartDevice &signOffRxCallback();
+        virtual UsartDevice *signOffRxCallback();
 
-        UsartDevice &transmit(uint32_t timeout);
+        virtual UsartDevice *transmit(uint32_t timeout);
 
         HAL_StatusTypeDef getState();
     };

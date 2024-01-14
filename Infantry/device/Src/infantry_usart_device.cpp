@@ -36,9 +36,9 @@ namespace infantry {
         }
     }
 
-    UsartDataType &UsartDataType::init() {
+    UsartDataType *UsartDataType::init() {
         _buffer = new uint8_t[_buffer_size];
-        return *this;
+        return this;
     }
 
     UsartDataType::~UsartDataType() {
@@ -56,30 +56,33 @@ namespace infantry {
         delete _tx_data;
     }
 
-    UsartDevice &UsartDevice::init() {
+    UsartDevice *UsartDevice::init() {
         if (_rx_data != nullptr) {
             _rx_data->init();
         }
         if (_tx_data != nullptr) {
             _tx_data->init();
         }
-        return *this;
+        if (getState() != HAL_OK) {
+            UsartErrorHandler("init failed");
+        }
+        return this;
     }
 
-    UsartDevice &UsartDevice::registerRxCallback() {
+    UsartDevice *UsartDevice::registerRxCallback() {
         if (_rx_data == nullptr) {
             UsartErrorHandler("Cannot register a receive callback function when the receive data type is null");
         }
         UsartDeviceRxDataMap[GetUsartIndex(_rx_data->_huart)] = _rx_data;
-        return *this;
+        return this;
     }
 
-    UsartDevice &UsartDevice::signOffRxCallback() {
+    UsartDevice *UsartDevice::signOffRxCallback() {
         UsartDeviceRxDataMap[GetUsartIndex(_rx_data->_huart)] = nullptr;
-        return *this;
+        return this;
     }
 
-    UsartDevice &UsartDevice::transmit(uint32_t timeout) {
+    UsartDevice *UsartDevice::transmit(uint32_t timeout) {
         if (_tx_data == nullptr) {
             UsartErrorHandler("Data cannot be sent if the send data type is null");
         }
@@ -87,23 +90,23 @@ namespace infantry {
         if (HAL_UART_Transmit(_tx_data->_huart, _tx_data->_buffer, _tx_data->_buffer_size, timeout) != HAL_OK) {
             logErrorWithTag("usart", "Data sending failure");
         }
-        return *this;
+        return this;
     }
 
     HAL_StatusTypeDef UsartDevice::getState() {
         return _rx_data->_state;
     }
 
-    UsartDataType &UsartRxDataType::rxCallback() {
+    UsartDataType *UsartRxDataType::rxCallback() {
         __HAL_DMA_DISABLE(_huart->hdmarx);
         int rxDataLen = _buffer_size - uint16_t(__HAL_DMA_GET_COUNTER(_huart->hdmarx));
         //rxCallback(rxDataLen);
         DMA_SET_COUNTER(_huart->hdmarx, _buffer_size);
         __HAL_DMA_ENABLE(_huart->hdmarx);
-        return *this;
+        return this;
     }
 
-    UsartRxDataType &UsartRxDataType::init() {
+    UsartRxDataType *UsartRxDataType::init() {
         UsartDataType::init();
         __HAL_UART_CLEAR_IDLEFLAG(_huart);
         __HAL_UART_ENABLE_IT(_huart, UART_IT_IDLE);
@@ -115,7 +118,7 @@ namespace infantry {
 
             if ((_huart)->Lock == HAL_LOCKED) {
                 _state = HAL_BUSY;
-                return *this;
+                return this;
             } else {
                 _huart->Lock = HAL_LOCKED;
             }
@@ -139,8 +142,7 @@ namespace infantry {
             _state = HAL_BUSY;
             UsartErrorHandler("DMA not ready");
         }
-        return *this;
-        return *this;
+        return this;
     }
 } // infantry
 
