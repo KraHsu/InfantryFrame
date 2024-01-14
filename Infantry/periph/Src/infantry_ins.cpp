@@ -160,7 +160,7 @@ namespace infantry {
     }
 
     void INS::getAttitudeAngle(float attitudeAngleArray[3]) const {
-        attitudeAngleArray[AttitudeAngleIndex::yaw] = _yaw;
+        attitudeAngleArray[AttitudeAngleIndex::totalYaw] = _yaw_total_angle;
         attitudeAngleArray[AttitudeAngleIndex::pitch] = _pitch;
         attitudeAngleArray[AttitudeAngleIndex::roll] = _roll;
     }

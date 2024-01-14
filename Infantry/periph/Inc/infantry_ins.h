@@ -64,7 +64,7 @@ namespace infantry {
         };
     public:
         using AttitudeAngleIndex = enum {
-            yaw = 0,
+            totalYaw = 0,
             pitch = 1,
             roll = 2
         };
