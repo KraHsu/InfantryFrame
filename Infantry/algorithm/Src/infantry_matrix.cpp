@@ -8,7 +8,7 @@
 #include "infantry_matrix.h"
 
 namespace infantry {
-    [[noreturn]] void MatrixErrorHandler(char *msg) {
+    [[noreturn]] void MatrixErrorHandler(const char *msg) {
         logErrorWithTag("Matrix", "%s", msg);
         while (true) {
             //TODO: MatrixErrorHandler

@@ -85,7 +85,7 @@ namespace infantry {
         };
     private:
         PIDController *_pid_cur, *_pid_spd, *_pid_pos;
-        float _absolute_angle{0};
+        float *_absolute_angle{nullptr};
         State _state{encoderAngle};
     public:
         class RxData final : public DjMotor::RxData {
@@ -109,7 +109,7 @@ namespace infantry {
 
         PositionMotor *setReference(float reference) override;
 
-        PositionMotor *setAbsoluteAngle(float absoluteAngle);
+        PositionMotor *setAbsoluteAngleGetter(float *absoluteAnglePtr);
 
         PositionMotor *setState(State state);
 

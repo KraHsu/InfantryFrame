@@ -21,10 +21,14 @@ namespace infantry {
         float angleFeedback = 0;
         switch (_state) {
             case encoderAngle:
-                angleFeedback = rxData->_angles.limited_angle - 123.40f;
+                angleFeedback = rxData->_angles.consequent_angle;
                 break;
             case absoluteAngle:
-                angleFeedback = _absolute_angle;
+                if (_absolute_angle != nullptr) {
+                    angleFeedback = *_absolute_angle;
+                } else {
+                    logErrorWithTag("pMotor", "absolute angle is nullptr");
+                }
                 break;
         }
 
@@ -33,7 +37,6 @@ namespace infantry {
         auto output = _pid_cur->setReference(spdOutput).setFeedback(rxData->_encoder.filteredCurrent).calculate();
 
         txData->_current = int16_t(output);
-//        logInfoWithTag("6020", "output is %d", txData->_current);
         return this;
     }
 
@@ -42,8 +45,8 @@ namespace infantry {
         return this;
     }
 
-    PositionMotor *PositionMotor::setAbsoluteAngle(float absoluteAngle) {
-        _absolute_angle = absoluteAngle;
+    PositionMotor *PositionMotor::setAbsoluteAngleGetter(float *absoluteAnglePtr) {
+        _absolute_angle = absoluteAnglePtr;
         return this;
     }
 
