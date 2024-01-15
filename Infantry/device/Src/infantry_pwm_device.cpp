@@ -6,6 +6,7 @@
  * @date 12/12/2023
  */
 #include "infantry_pwm_device.h"
+#include "infantry_log.h"
 
 namespace infantry {
     PwmDevice::PwmDevice(TIM_HandleTypeDef *htim, uint32_t channel, uint32_t clock)
@@ -57,9 +58,45 @@ namespace infantry {
         return this;
     }
 
-    void PwmEncoder::start() {
-        HAL_TIM_Encoder_Start(_htim, TIM_CHANNEL_ALL);
+    PwmEncoder *PwmEncoder::start() {
+        if (HAL_TIM_Encoder_Start(_htim, TIM_CHANNEL_ALL) != HAL_OK) {
+            logErrorWithTag("PwmEncoder", "HAL_TIM_Encoder_Start error");
+            while (true) {
+
+            }
+        }
+        return this;
     }
 
-    PwmEncoder::PwmEncoder(TIM_HandleTypeDef *htim) : _htim{htim} {}
+    PwmEncoder::PwmEncoder(TIM_HandleTypeDef *htim)
+            : _htim{htim} {}
+
+    PwmEncoder *PwmEncoder::init() {
+        return this;
+    }
+
+    PwmEncoder *PwmEncoder::update() {
+        uint8_t direction{};
+        uint16_t counter{};
+        uint16_t feedback{};
+
+        direction = __HAL_TIM_IS_TIM_COUNTING_DOWN(_htim);
+        counter = __HAL_TIM_GET_COUNTER(_htim);
+
+        if (direction == 0) {
+            feedback = counter;
+        } else {
+            feedback = 65535 - counter;
+        }
+        if (feedback == 65535) {
+            feedback = 0;
+        }
+        __HAL_TIM_SET_COUNTER(_htim, 0);
+
+        _speed = float(feedback) / 2048 * 3.1415926f * 26;
+
+        _feedback = _speed_filter.calculate(_speed);
+
+        return this;
+    }
 } // infantry

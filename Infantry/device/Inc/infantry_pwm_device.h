@@ -6,6 +6,7 @@
 #pragma once
 
 #include "tim.h"
+#include "infantry_low_pass_filter.h"
 
 #include <functional>
 
@@ -66,12 +67,16 @@ namespace infantry {
     class PwmEncoder {
     private:
         TIM_HandleTypeDef *_htim;
-        uint8_t _direction{};
-        uint16_t _counter{};
-        uint32_t _last_update_time{};
+        float _speed{};
+        float _feedback{};
+        LowPassFilter _speed_filter{0.05f};
     public:
         explicit PwmEncoder(TIM_HandleTypeDef *htim);
 
-        void start();
+        PwmEncoder *init();
+
+        PwmEncoder *start();
+
+        PwmEncoder *update();
     };
 } // infantry

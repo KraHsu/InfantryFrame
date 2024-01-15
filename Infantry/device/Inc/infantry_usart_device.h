@@ -73,7 +73,7 @@ namespace infantry {
     };
 
     class UsartDevice {
-    private:
+    protected:
         UsartRxDataType *_rx_data{nullptr};
         UsartTxDataType *_tx_data{nullptr};
     public:
