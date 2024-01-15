@@ -84,14 +84,14 @@ namespace infantry {
 namespace infantry {
     class PositionMotor final : public DjMotor {
     public:
-        using State = enum {
-            encoderAngle = 0,
-            absoluteAngle = 1
+        using PidFdbIndex = enum {
+            CurrentPid = 0,
+            SpeedPid = 1,
+            PositionPid = 2,
         };
     private:
         PIDController *_pid_cur, *_pid_spd, *_pid_pos;
-        float *_absolute_angle{nullptr};
-        State _state{encoderAngle};
+        float *_pid_fdb_ptr[3]{nullptr};
     public:
         class RxData final : public DjMotor::RxData {
         public:
@@ -114,9 +114,7 @@ namespace infantry {
 
         PositionMotor *setReference(float reference) override;
 
-        PositionMotor *setAbsoluteAngleGetter(float *absoluteAnglePtr);
-
-        PositionMotor *setState(State state);
+        PositionMotor *setFdbPtr(float *currentPtr, float *speedPtr, float *positionPtr);
 
         PositionMotor *update() override;
 

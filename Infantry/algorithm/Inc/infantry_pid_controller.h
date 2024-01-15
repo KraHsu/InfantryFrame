@@ -74,16 +74,16 @@ namespace infantry {
 
         float getReference() const;
 
-        PIDController &setReference(float ref);
+        PIDController *setReference(float ref);
 
-        PIDController &addReference(float inc);
+        PIDController *addReference(float inc);
 
         float getFeedback() const;
 
-        PIDController &setFeedback(float fdb);
+        PIDController *setFeedback(float fdb);
 
         float calculate();
 
-        PIDController &clear();
+        PIDController *clear();
     };
 } // infantry

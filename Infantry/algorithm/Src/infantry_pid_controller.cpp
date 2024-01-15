@@ -26,23 +26,23 @@ namespace infantry {
         return _reference;
     }
 
-    PIDController &PIDController::setReference(float ref) {
+    PIDController *PIDController::setReference(float ref) {
         this->_reference = ref;
-        return *this;
+        return this;
     }
 
-    PIDController &PIDController::addReference(float inc) {
+    PIDController *PIDController::addReference(float inc) {
         _reference += inc;
-        return *this;
+        return this;
     }
 
     float PIDController::getFeedback() const {
         return _feedback;
     }
 
-    PIDController &PIDController::setFeedback(float fdb) {
+    PIDController *PIDController::setFeedback(float fdb) {
         _feedback = fdb;
-        return *this;
+        return this;
     }
 
     float PIDController::calculate() {
@@ -120,7 +120,7 @@ namespace infantry {
         return _output;
     }
 
-    PIDController &PIDController::clear() {
+    PIDController *PIDController::clear() {
         _reference = 0;
         _feedback = 0;
         _err[0] = 0;
@@ -133,6 +133,6 @@ namespace infantry {
         _out_feed_forward = 0;
         _sum = 0;
         _output = 0;
-        return *this;
+        return this;
     }
 } // infantry

@@ -123,3 +123,13 @@ int16_t buff2i16(uint8_t *buff) {
 float SaturateWithTanhK(float input, float k) {
     return std::tanh(input) * k;
 }
+
+float ClampWithLR(float input, float l, float r) {
+    if (input < l) {
+        return l;
+    }
+    if (input > r) {
+        return r;
+    }
+    return input;
+}

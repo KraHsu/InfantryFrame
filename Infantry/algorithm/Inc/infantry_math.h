@@ -156,3 +156,13 @@ int16_t buff2i16(uint8_t *buff);
  * @return float The saturated output, which is the result of applying the hyperbolic tangent function to the input and then scaling it by k.
  */
 float SaturateWithTanhK(float input, float k);
+
+/**
+ * Clamps an input value within a specified range, with defined l and r values.
+ *
+ * @param input The value to be clamped.
+ * @param l     The lower bound of the clamping range.
+ * @param r     The upper bound of the clamping range.
+ * @return      The clamped value, limited between l and r.
+ */
+float ClampWithLR(float input, float l, float r);

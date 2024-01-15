@@ -18,36 +18,35 @@ namespace infantry {
         auto *txData = (PositionMotor::TxData *) (_tx_data);
         auto *rxData = (PositionMotor::RxData *) (_rx_data);
 
-        float angleFeedback = 0;
-        switch (_state) {
-            case encoderAngle:
-                angleFeedback = rxData->_angles.consequent_angle;
-                break;
-            case absoluteAngle:
-                if (_absolute_angle != nullptr) {
-                    angleFeedback = *_absolute_angle;
-                } else {
-                    logErrorWithTag("pMotor", "absolute angle is nullptr");
-                }
-                break;
-        }
-
-        float reference = 0;
-        if (_reference - angleFeedback > 60.0f) {
-            reference = angleFeedback + 60.0f;
-        } else if (_reference - angleFeedback < -60.0f) {
-            reference = angleFeedback - 60.0f;
+        if (_pid_fdb_ptr[PositionPid] != nullptr) {
+            _pid_pos->setFeedback(*_pid_fdb_ptr[PositionPid])
+                    ->setReference(
+                            ClampWithLR(_reference - *_pid_fdb_ptr[PositionPid], -60.0f, 60.0f)
+                            + *_pid_fdb_ptr[PositionPid]
+                    );
         } else {
-            reference = _reference;
+            _pid_pos->setFeedback(rxData->_angles.consequent_angle)
+                    ->setReference(
+                            ClampWithLR(_reference - rxData->_angles.consequent_angle, -60.0f, 60.0f)
+                            + rxData->_angles.consequent_angle
+                    );
         }
 
-        logInfoWithTag("reference", "%f", reference);
+        if (_pid_fdb_ptr[SpeedPid] != nullptr) {
+            _pid_spd->setFeedback(*_pid_fdb_ptr[SpeedPid]);
+        } else {
+            _pid_spd->setFeedback(rxData->_encoder.speed);
+        }
 
-        auto posOutput = _pid_pos->setReference(reference)
-                                 .setFeedback(angleFeedback)
-                                 .calculate();
-        auto spdOutput = _pid_spd->setReference(posOutput).setFeedback(rxData->_encoder.speed).calculate();
-        auto output = _pid_cur->setReference(spdOutput).setFeedback(rxData->_encoder.filteredCurrent).calculate();
+        if (_pid_fdb_ptr[CurrentPid] != nullptr) {
+            _pid_cur->setFeedback(*_pid_fdb_ptr[CurrentPid]);
+        } else {
+            _pid_cur->setFeedback(rxData->_encoder.filteredCurrent);
+        }
+
+        auto posOutput = _pid_pos->calculate();
+        auto spdOutput = _pid_spd->setReference(posOutput)->calculate();
+        auto output = _pid_cur->setReference(spdOutput)->calculate();
 
         txData->_current = int16_t(output);
         return this;
@@ -58,18 +57,15 @@ namespace infantry {
         return this;
     }
 
-    PositionMotor *PositionMotor::setAbsoluteAngleGetter(float *absoluteAnglePtr) {
-        _absolute_angle = absoluteAnglePtr;
-        return this;
-    }
-
     PositionMotor *PositionMotor::control() {
         transmit();
         return this;
     }
 
-    PositionMotor *PositionMotor::setState(PositionMotor::State state) {
-        _state = state;
+    PositionMotor *PositionMotor::setFdbPtr(float *currentPtr, float *speedPtr, float *positionPtr) {
+        _pid_fdb_ptr[CurrentPid] = currentPtr;
+        _pid_fdb_ptr[SpeedPid] = speedPtr;
+        _pid_fdb_ptr[PositionPid] = positionPtr;
         return this;
     }
 
@@ -93,11 +89,11 @@ namespace infantry {
         auto *rxData = (SpeedMotor::RxData *) (_rx_data);
         auto *txData = (SpeedMotor::TxData *) (_tx_data);
 
-        auto spdOutput = _pid_spd->setReference(_reference).setFeedback(rxData->_encoder.speed).calculate();
+        auto spdOutput = _pid_spd->setReference(_reference)->setFeedback(rxData->_encoder.speed)->calculate();
         txData->_current = int16_t(
-                _pid_cur->setReference(spdOutput).setFeedback(rxData->_encoder.filteredCurrent).calculate()
+                _pid_cur->setReference(spdOutput)->setFeedback(rxData->_encoder.filteredCurrent)->calculate()
         );
-//        logInfoWithTag("6020", "output is %d", txData->_current);
+//        logInfoWithTag("6020", "outp->t is %d", txData->_current);
         return this;
     }
 
