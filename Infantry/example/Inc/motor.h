@@ -27,14 +27,6 @@ namespace infantry {
 namespace infantry {
     class DjMotor : public FdcanDevice, public Motor {
     public:
-        class RxData;
-
-        class TxData;
-
-        using FdcanDevice::FdcanDevice;
-    };
-
-    class DjMotor::RxData : public FdcanRxDataType {
         using EncoderType = struct {
             int16_t angle;
             int16_t speed;
@@ -50,18 +42,29 @@ namespace infantry {
             float limited_angle;
             float consequent_angle;
         };
+    public:
+        class RxData;
+
+        class TxData;
+
+        using FdcanDevice::FdcanDevice;
+
+        AngleType *getAnglePtr();
+
+        EncoderType *getEncoderPtr();
+    };
+
+    class DjMotor::RxData : public FdcanRxDataType {
     protected:
         EncoderType _encoder{};
         AngleType _angles{};
         LowPassFilter _feedback_filter{-1};
     public:
+        friend class DjMotor;
+
         using FdcanRxDataType::FdcanRxDataType;
 
         RxData *rxCallback(FDCAN_RxHeaderTypeDef header, std::uint8_t *buffer) override;
-
-        EncoderType getEncoderData();
-
-        AngleType getAngleData();
     };
 
     class DjMotor::TxData : public FdcanTxDataType {
@@ -69,6 +72,8 @@ namespace infantry {
         uint8_t _motor_id;
         int16_t _current{0};
     public:
+        friend class DjMotor;
+
         TxData(FDCAN_HandleTypeDef *ph_fdcan, FDCAN_TxHeaderTypeDef header, uint8_t motor_id);
 
         TxData *txHook() override;
@@ -165,6 +170,8 @@ namespace infantry {
         SpeedMotorGroup *init(SpeedMotor *motor0, SpeedMotor *motor1, SpeedMotor *motor2, SpeedMotor *motor3);
 
         SpeedMotorGroup *serReference(float motor0_ref, float motor1_ref, float motor2_ref, float motor3_ref);
+
+        SpeedMotorGroup *setVelocity(float normal, float tangential, float angular);
 
         SpeedMotorGroup *update();
 

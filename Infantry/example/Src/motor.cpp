@@ -32,7 +32,18 @@ namespace infantry {
                 break;
         }
 
-        auto posOutput = _pid_pos->setReference(_reference)
+        float reference = 0;
+        if (_reference - angleFeedback > 60.0f) {
+            reference = angleFeedback + 60.0f;
+        } else if (_reference - angleFeedback < -60.0f) {
+            reference = angleFeedback - 60.0f;
+        } else {
+            reference = _reference;
+        }
+
+        logInfoWithTag("reference", "%f", reference);
+
+        auto posOutput = _pid_pos->setReference(reference)
                                  .setFeedback(angleFeedback)
                                  .calculate();
         auto spdOutput = _pid_spd->setReference(posOutput).setFeedback(rxData->_encoder.speed).calculate();
@@ -60,6 +71,14 @@ namespace infantry {
     PositionMotor *PositionMotor::setState(PositionMotor::State state) {
         _state = state;
         return this;
+    }
+
+    DjMotor::AngleType *DjMotor::getAnglePtr() {
+        return &(((DjMotor::RxData *) _rx_data)->_angles);
+    }
+
+    DjMotor::EncoderType *DjMotor::getEncoderPtr() {
+        return &(((DjMotor::RxData *) _rx_data)->_encoder);
     }
 }
 
@@ -148,6 +167,14 @@ namespace infantry {
         }
         return this;
     }
+
+    SpeedMotorGroup *SpeedMotorGroup::setVelocity(float normal, float tangential, float angular) {
+        _motor[0]->setReference((normal + tangential + 0.5f * angular) * 19.2f);
+        _motor[1]->setReference((-normal + tangential + 0.5f * angular) * 19.2f);
+        _motor[2]->setReference((-normal - tangential + 0.5f * angular) * 19.2f);
+        _motor[3]->setReference((normal - tangential + 0.5f * angular) * 19.2f);
+        return this;
+    }
 }
 
 /* DjMotor */
@@ -174,14 +201,6 @@ namespace infantry {
         _angles.limited_angle = (float) _encoder.angle / 8192.0f * 360.0f;
 
         return this;
-    }
-
-    DjMotor::RxData::EncoderType DjMotor::RxData::getEncoderData() {
-        return _encoder;
-    }
-
-    DjMotor::RxData::AngleType DjMotor::RxData::getAngleData() {
-        return _angles;
     }
 
     DjMotor::TxData::TxData(FDCAN_HandleTypeDef *ph_fdcan, FDCAN_TxHeaderTypeDef header, uint8_t motor_id)

@@ -84,3 +84,7 @@ using SetupCallType = struct {
 #define INF_TASK_EXECUTE_N(n) (n)
 
 #define Import extern
+
+/* constant */
+const float FULL_CIRCLE = 360.0f;
+const float HALF_CIRCLE = 180.0f;
