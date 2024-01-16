@@ -8,6 +8,7 @@
  */
 
 #include "infantry_kalman.h"
+#pragma comment(lib, "arm_cortexM4lf_math.lib")
 
 namespace infantry {
 
