@@ -66,9 +66,9 @@ namespace infantry {
         using AttitudeAngleIndex = enum {
             totalYaw = 0,
             pitch = 1,
-            roll = 2
+            roll = 2,
         };
-    private:
+    protected:
         IMU *_imu{nullptr};
 
         QEKF *_qekf{nullptr};
@@ -106,21 +106,9 @@ namespace infantry {
          */
         INS(IMU *imu, QEKF *qekf);
 
-        INS *init();
+        virtual INS *init() = 0;
 
-        INS *update();
-
-        /**
-         * @brief reserved.It is used to correct IMU installation error and scale factor error,
-         *        i.e. the installation deviation of gyroscope axis and PTZ axis
-         */
-        INS *paramCorrection();
-
-        INS *installCompAngle(const float correc_mat[3][3]);
-
-        bool isDependable();
-
-        void getAttitudeAngle(float attitudeAngleArray[3]) const;
+        virtual INS *update() = 0;
     };
 
     void BodyFrameToEarthFrame(const float *vecBF, float *vecEF, const float *q);
