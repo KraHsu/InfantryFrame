@@ -80,6 +80,21 @@ EXPORT_BOARD_SETUP(init_log) {
     rt_hw_interrupt_enable(level);
 }
 
+const char *getHALResponseString(uint8_t response) {
+    switch (response) {
+        case 0x00u:
+            return "HAL_OK";
+        case 0x01u:
+            return "HAL_ERROR";
+        case 0x02u:
+            return "HAL_BUSY";
+        case 0x03u:
+            return "HAL_TIMEOUT";
+        default:
+            return "UNKNOWN";
+    }
+}
+
 #ifdef __cplusplus
 namespace infantry {
     LogOut cout{};

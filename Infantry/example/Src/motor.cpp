@@ -1,10 +1,32 @@
-/**
- * @file Infantry/example/Src
- * @brief $Brief$
- * @details $Detaile$
- * @author CharlesHsu
- * @date 12/26/2023
+/*
+ *                                                     __----~~~~~~~~~~~------___
+ *                                    .  .   ~~//====......          __--~ ~~
+ *                    -.            \_|//     |||\\  ~~~~~~::::... /~
+ *                 ___-==_       _-~o~  \/    |||  \\            _/~~-
+ *         __---~~~.==~||\=_    -_--~/_-~|-   |\\   \\        _/~
+ *     _-~~     .=~    |  \\-_    '-~7  /-   /  ||    \      /
+ *   .~       .~       |   \\ -_    /  /-   /   ||      \   /
+ *  /  ____  /         |     \\ ~-_/  /|- _/   .||       \ /
+ *  |~~    ~~|--~~~~--_ \     ~==-/   | \~--===~~        .\
+ *           '         ~-|      /|    |-~\~~       __--~~
+ *                       |-~~-_/ |    |   ~\_   _-~            /\
+ *                            /  \     \__   \/~                \__
+ *                        _--~ _/ | .-~~____--~-/                  ~~==.
+ *                       ((->/~   '.|||' -_|    ~~-/ ,              . _||
+ *                                  -_     ~\      ~~---l__i__i__i--~~_/
+ *                                  _-~-__   ~)  \--______________--~~
+ *                                //.-~~~-~_--~- |-------~~~~~~~~
+ *                                       //.-~~~--\
+ *                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * 
+ *                               神兽保佑            永无BUG
+ * 
+ * @Date: 2024-01-16 20:40:50
+ * @LastEditors: KraHsu && 1191393280@qq.com
+ * @LastEditTime: 2024-01-17 01:54:08
+ * Copyright (c) 2024 by KraHsu, All Rights Reserved. 
  */
+
 #include "motor.h"
 
 /* PositionMotor */
@@ -62,7 +84,7 @@ namespace infantry {
         return this;
     }
 
-    PositionMotor *PositionMotor::setFdbPtr(float *currentPtr, float *speedPtr, float *positionPtr) {
+    PositionMotor *PositionMotor::setFdbPtr(const float *currentPtr, const float *speedPtr, const float *positionPtr) {
         _pid_fdb_ptr[CurrentPid] = currentPtr;
         _pid_fdb_ptr[SpeedPid] = speedPtr;
         _pid_fdb_ptr[PositionPid] = positionPtr;
@@ -176,6 +198,9 @@ namespace infantry {
 /* DjMotor */
 namespace infantry {
     DjMotor::RxData *DjMotor::RxData::rxCallback(FDCAN_RxHeaderTypeDef header, std::uint8_t *buffer) {
+        if (header.Identifier != stdID) {
+            return this;
+        }
         _angles.last_angle = _encoder.angle;
         _encoder.angle = int16_t(buffer[0] << 8 | buffer[1]);
         _encoder.speed = int16_t(buffer[2] << 8 | buffer[3]);
@@ -200,7 +225,7 @@ namespace infantry {
     }
 
     DjMotor::TxData::TxData(FDCAN_HandleTypeDef *ph_fdcan, FDCAN_TxHeaderTypeDef header, uint8_t motor_id)
-            : FdcanTxDataType(header, ph_fdcan, 8), _motor_id{motor_id} {}
+            : FdcanTxDataType(ph_fdcan, header, 8), _motor_id{motor_id} {}
 
     DjMotor::TxData *DjMotor::TxData::txHook() {
         if (_buffer_size == 0 || _buffer == nullptr) {

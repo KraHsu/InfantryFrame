@@ -1,8 +1,34 @@
-/**
- * @file Infantry/algorithm
- * @author CharlesHsu
- * @date 11/12/2023
+/*
+ * 
+ * 　　┏┓　　　┏┓+ +
+ * 　┏┛┻━━━┛┻┓ + +
+ * 　┃　　　　　　　┃ 　
+ * 　┃　　　━　　　┃ ++ + + +
+ *  ████━████ ┃+
+ * 　┃　　　　　　　┃ +
+ * 　┃　　　┻　　　┃
+ * 　┃　　　　　　　┃ + +
+ * 　┗━┓　　　┏━┛
+ * 　　　┃　　　┃　　　　　　　　　　　
+ * 　　　┃　　　┃ + + + +
+ * 　　　┃　　　┃
+ * 　　　┃　　　┃ +  神兽保佑
+ * 　　　┃　　　┃    代码无bug　　
+ * 　　　┃　　　┃　　+　　　　　　　　　
+ * 　　　┃　 　　┗━━━┓ + +
+ * 　　　┃ 　　　　　　　┣┓
+ * 　　　┃ 　　　　　　　┏┛
+ * 　　　┗┓┓┏━┳┓┏┛ + + + +
+ * 　　　　┃┫┫　┃┫┫
+ * 　　　　┗┻┛　┗┻┛+ + + +
+ * 
+ * 
+ * @Date: 2024-01-16 20:40:50
+ * @LastEditors: KraHsu && 1191393280@qq.com
+ * @LastEditTime: 2024-01-17 01:52:49
+ * Copyright (c) 2024 by KraHsu, All Rights Reserved. 
  */
+
 #include "algorithm/Inc/infantry_pid_controller.h"
 
 namespace infantry {

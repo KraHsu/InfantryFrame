@@ -1,8 +1,32 @@
-/**
- * @file Infantry/example/Src
- * @author CharlesHsu
- * @date 12/26/2023
+/*
+ *                                                     __----~~~~~~~~~~~------___
+ *                                    .  .   ~~//====......          __--~ ~~
+ *                    -.            \_|//     |||\\  ~~~~~~::::... /~
+ *                 ___-==_       _-~o~  \/    |||  \\            _/~~-
+ *         __---~~~.==~||\=_    -_--~/_-~|-   |\\   \\        _/~
+ *     _-~~     .=~    |  \\-_    '-~7  /-   /  ||    \      /
+ *   .~       .~       |   \\ -_    /  /-   /   ||      \   /
+ *  /  ____  /         |     \\ ~-_/  /|- _/   .||       \ /
+ *  |~~    ~~|--~~~~--_ \     ~==-/   | \~--===~~        .\
+ *           '         ~-|      /|    |-~\~~       __--~~
+ *                       |-~~-_/ |    |   ~\_   _-~            /\
+ *                            /  \     \__   \/~                \__
+ *                        _--~ _/ | .-~~____--~-/                  ~~==.
+ *                       ((->/~   '.|||' -_|    ~~-/ ,              . _||
+ *                                  -_     ~\      ~~---l__i__i__i--~~_/
+ *                                  _-~-__   ~)  \--______________--~~
+ *                                //.-~~~-~_--~- |-------~~~~~~~~
+ *                                       //.-~~~--\
+ *                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * 
+ *                               神兽保佑            永无BUG
+ * 
+ * @Date: 2024-01-16 20:40:50
+ * @LastEditors: KraHsu && 1191393280@qq.com
+ * @LastEditTime: 2024-01-17 01:54:31
+ * Copyright (c) 2024 by KraHsu, All Rights Reserved. 
  */
+
 #pragma once
 
 #include "device/Inc/infantry_fdcan_device.h"
@@ -91,7 +115,7 @@ namespace infantry {
         };
     private:
         PIDController *_pid_cur, *_pid_spd, *_pid_pos;
-        float *_pid_fdb_ptr[3]{nullptr};
+        const float *_pid_fdb_ptr[3]{nullptr};
     public:
         class RxData final : public DjMotor::RxData {
         public:
@@ -114,7 +138,7 @@ namespace infantry {
 
         PositionMotor *setReference(float reference) override;
 
-        PositionMotor *setFdbPtr(float *currentPtr, float *speedPtr, float *positionPtr);
+        PositionMotor *setFdbPtr(const float *currentPtr,const float *speedPtr,const float *positionPtr);
 
         PositionMotor *update() override;
 

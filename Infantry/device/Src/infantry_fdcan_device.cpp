@@ -1,10 +1,20 @@
-/**
- * @file Infantry/Src
- * @brief $Brief$
- * @details $Detaile$
- * @author CharlesHsu
- * @date 11/11/2023
+/*
+ *           佛曰:  
+ *                   写字楼里写字间，写字间里程序员；  
+ *                   程序人员写程序，又拿程序换酒钱。  
+ *                   酒醒只在网上坐，酒醉还来网下眠；  
+ *                   酒醉酒醒日复日，网上网下年复年。  
+ *                   但愿老死电脑间，不愿鞠躬老板前；  
+ *                   奔驰宝马贵者趣，公交自行程序员。  
+ *                   别人笑我忒疯癫，我笑自己命太贱；  
+ *                   不见满街漂亮妹，哪个归得程序员？
+ * 
+ * @Date: 2024-01-16 20:40:50
+ * @LastEditors: KraHsu && 1191393280@qq.com
+ * @LastEditTime: 2024-01-17 01:53:38
+ * Copyright (c) 2024 by KraHsu, All Rights Reserved. 
  */
+
 #include "device/Inc/infantry_fdcan_device.h"
 #include "fdcan.h"
 /* Global variables and functions */
@@ -36,19 +46,18 @@ namespace infantry {
                     ph_fdcan, ph_fdcan->Init.DataPrescaler * ph_fdcan->Init.DataTimeSeg1, 0
             );
             HAL_FDCAN_EnableTxDelayCompensation(ph_fdcan);
-        } else {
-            FDCAN_FilterTypeDef sFilterConfig;
-            sFilterConfig.IdType = FDCAN_STANDARD_ID;
-            sFilterConfig.FilterIndex = 0;
-            sFilterConfig.FilterType = FDCAN_FILTER_MASK;
-            sFilterConfig.FilterConfig = FDCAN_FILTER_TO_RXFIFO0;
-            sFilterConfig.FilterID1 = 0x0400;
-            sFilterConfig.FilterID2 = 0x0000;
-            if (HAL_FDCAN_ConfigFilter(ph_fdcan, &sFilterConfig) != HAL_OK) {
-                FDCAN_ErrorHandler();
-            }
         }
 
+        FDCAN_FilterTypeDef sFilterConfig;
+        sFilterConfig.IdType = FDCAN_STANDARD_ID;
+        sFilterConfig.FilterIndex = 0;
+        sFilterConfig.FilterType = FDCAN_FILTER_MASK;
+        sFilterConfig.FilterConfig = FDCAN_FILTER_TO_RXFIFO0;
+        sFilterConfig.FilterID1 = 0x0400;
+        sFilterConfig.FilterID2 = 0x0000;
+        if (HAL_FDCAN_ConfigFilter(ph_fdcan, &sFilterConfig) != HAL_OK) {
+            FDCAN_ErrorHandler();
+        }
         if (HAL_FDCAN_ConfigGlobalFilter(
                 ph_fdcan, FDCAN_REJECT, FDCAN_REJECT, FDCAN_FILTER_REMOTE, FDCAN_FILTER_REMOTE) != HAL_OK) {
             FDCAN_ErrorHandler();
@@ -56,8 +65,10 @@ namespace infantry {
         if (HAL_FDCAN_Start(ph_fdcan) != HAL_OK) {
             FDCAN_ErrorHandler();
         }
-
         if (HAL_FDCAN_ActivateNotification(ph_fdcan, FDCAN_IT_RX_FIFO0_NEW_MESSAGE, 0) != HAL_OK) {
+            FDCAN_ErrorHandler();
+        }
+        if (HAL_FDCAN_ActivateNotification(ph_fdcan, FDCAN_IT_TX_FIFO_EMPTY, 0) != HAL_OK) {
             FDCAN_ErrorHandler();
         }
         if (HAL_FDCAN_ActivateNotification(ph_fdcan, FDCAN_IT_BUS_OFF, 0) != HAL_OK) {
@@ -110,8 +121,15 @@ namespace infantry {
             FdcanErrorHandler("Data cannot be sent if the send data type is null");
         }
         _tx_data->txHook();
-        if (HAL_FDCAN_AddMessageToTxFifoQ(_tx_data->_ph_fdcan, &_tx_data->_header, _tx_data->_buffer) != HAL_OK) {
+        auto res = HAL_FDCAN_AddMessageToTxFifoQ(_tx_data->_ph_fdcan, &_tx_data->_header, _tx_data->_buffer);
+        if (res != HAL_OK) {
             logErrorWithTag("fdcan", "Data sending failure");
+            if (_tx_data->_ph_fdcan->ErrorCode | HAL_FDCAN_ERROR_FIFO_FULL) {
+                logErrorWithTag("fdcan", "FDCAN_ERROR_TX_FIFO_FULL");
+//                HAL_FDCAN_Stop(_tx_data->_ph_fdcan);
+//                _tx_data->_ph_fdcan->Instance->TXFQS = 0x03;
+//                HAL_FDCAN_Start(_tx_data->_ph_fdcan);
+            }
         }
         return this;
     }
@@ -120,7 +138,7 @@ namespace infantry {
         return this;
     }
 
-    FdcanTxDataType::FdcanTxDataType(FDCAN_TxHeaderTypeDef header, FDCAN_HandleTypeDef *ph_fdcan, uint16_t buffer_size)
+    FdcanTxDataType::FdcanTxDataType(FDCAN_HandleTypeDef *ph_fdcan, FDCAN_TxHeaderTypeDef header, uint16_t buffer_size)
             : FdcanDataType(ph_fdcan), _header{header}, _buffer_size{buffer_size} {}
 
     FdcanTxDataType *FdcanTxDataType::init() {
@@ -147,7 +165,6 @@ void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *phfdcan, uint32_t RxFifo0ITs
 //                        phfdcan == &hfdcan1 ? 1 : (phfdcan == &hfdcan2 ? 2 : (phfdcan == &hfdcan3 ? 3 : 0)),
 //                        FdcanTempHeader.Identifier
 //        );
-
         infantry::FdcanRxDataType **rxList{nullptr};
         if (phfdcan == &hfdcan1) {
             rxList = infantry::Fdcan1DeviceRxList;
@@ -161,9 +178,7 @@ void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *phfdcan, uint32_t RxFifo0ITs
             for (int i = 0; i < 16; i++) {
                 auto device_ptr = *(rxList + i);
                 if (device_ptr == nullptr) { break; }
-                if (FdcanTempHeader.Identifier == device_ptr->stdID) {
-                    device_ptr->rxCallback(FdcanTempHeader, FdcanTempBuffer);
-                }
+                device_ptr->rxCallback(FdcanTempHeader, FdcanTempBuffer);
             }
         }
 
@@ -172,3 +187,25 @@ void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *phfdcan, uint32_t RxFifo0ITs
         }
     }
 }
+
+void HAL_FDCAN_TxFifoEmptyCallback(FDCAN_HandleTypeDef *hfdcan) {
+    if (HAL_FDCAN_ActivateNotification(hfdcan, FDCAN_IT_TX_FIFO_EMPTY, 0) != HAL_OK) {
+        while (true) {}
+    }
+}
+
+//void HAL_FDCAN_ErrorCallback(FDCAN_HandleTypeDef *hfdcan) {
+//    if (hfdcan->ErrorCode | HAL_FDCAN_ERROR_NOT_STARTED) {
+//        while (hfdcan->ErrorCode | HAL_FDCAN_ERROR_NOT_STARTED) {
+//            HAL_FDCAN_Stop(hfdcan);
+//            HAL_FDCAN_Start(hfdcan);
+//            HAL_Delay(10);
+//        }
+//    }
+//    if (hfdcan->ErrorCode | HAL_FDCAN_ERROR_FIFO_FULL) {
+//        logErrorWithTag("fdcan", "FDCAN_ERROR_TX_FIFO_FULL");
+//        HAL_FDCAN_Stop(hfdcan);
+//        hfdcan->Instance->TXFQS = 0x03;
+//        HAL_FDCAN_Start(hfdcan);
+//    }
+//}

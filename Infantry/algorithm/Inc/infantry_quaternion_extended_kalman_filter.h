@@ -1,7 +1,30 @@
-/**
- * @file Infantry/algorithm/Src
- * @author CharlesHsu
- * @date 12/22/2023
+/*
+ *                                                     __----~~~~~~~~~~~------___
+ *                                    .  .   ~~//====......          __--~ ~~
+ *                    -.            \_|//     |||\\  ~~~~~~::::... /~
+ *                 ___-==_       _-~o~  \/    |||  \\            _/~~-
+ *         __---~~~.==~||\=_    -_--~/_-~|-   |\\   \\        _/~
+ *     _-~~     .=~    |  \\-_    '-~7  /-   /  ||    \      /
+ *   .~       .~       |   \\ -_    /  /-   /   ||      \   /
+ *  /  ____  /         |     \\ ~-_/  /|- _/   .||       \ /
+ *  |~~    ~~|--~~~~--_ \     ~==-/   | \~--===~~        .\
+ *           '         ~-|      /|    |-~\~~       __--~~
+ *                       |-~~-_/ |    |   ~\_   _-~            /\
+ *                            /  \     \__   \/~                \__
+ *                        _--~ _/ | .-~~____--~-/                  ~~==.
+ *                       ((->/~   '.|||' -_|    ~~-/ ,              . _||
+ *                                  -_     ~\      ~~---l__i__i__i--~~_/
+ *                                  _-~-__   ~)  \--______________--~~
+ *                                //.-~~~-~_--~- |-------~~~~~~~~
+ *                                       //.-~~~--\
+ *                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ *                               神兽保佑            永无BUG
+ *
+ * @Date: 2024-01-16 20:40:50
+ * @LastEditors: KraHsu && 1191393280@qq.com
+ * @LastEditTime: 2024-01-17 01:50:40
+ * Copyright (c) 2024 by KraHsu, All Rights Reserved.
  */
 
 #pragma once
@@ -10,8 +33,10 @@
 
 #define QEKF QuaternionExtendedKalmanFilter
 
-namespace infantry {
-    class QEKF : public KalmanFilter {
+namespace infantry
+{
+    class QEKF : public KalmanFilter
+    {
     public:
         uint8_t _initialized{0};
         uint8_t _converge_flag{0};

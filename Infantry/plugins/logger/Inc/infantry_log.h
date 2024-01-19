@@ -55,6 +55,8 @@
 #define logVerbose(...)       ((void)0);
 #endif
 
+const char *getHALResponseString(uint8_t response);
+
 #ifdef __cplusplus
 
 namespace infantry {

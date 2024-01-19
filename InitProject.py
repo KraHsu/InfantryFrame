@@ -3,9 +3,8 @@ import xml.etree.ElementTree as ET
 import re
 import os
 
-
 def modifyOption(project_name):
-    uvprojx = f"../{project_name}/MDK-ARM/{project_name}.uvprojx"
+    uvprojx = f"./MDK-ARM/{project_name}.uvprojx"
     with open(uvprojx, "r") as file:
         data = file.read()
     data = data.replace("<TargetOption>", "<uAC6>1</uAC6>\n<TargetOption>")
@@ -15,16 +14,15 @@ def modifyOption(project_name):
     with open(uvprojx, "w") as file:
         file.write(data)
 
-
 def modifyIncludePath(project_name):
-    uvprojx = f"../{project_name}/MDK-ARM/{project_name}.uvprojx"
+    uvprojx = f"./MDK-ARM/{project_name}.uvprojx"
     tree = ET.parse(uvprojx)
     root = tree.getroot()
 
     # 寻找Cads>VariousControls>IncludePath
     for include_path in root.findall(".//Cads/VariousControls/IncludePath"):
         current_paths = include_path.text
-        new_path = rf"..\..\InfantryFrame\Infantry\algorithm\Inc;..\..\InfantryFrame\Infantry\device\Inc;..\..\InfantryFrame\Infantry\frame\Inc;..\..\InfantryFrame\Infantry\plugins\graph_task\Inc;..\..\InfantryFrame\Infantry\plugins\logger\Inc;..\..\InfantryFrame\Infantry\library\Inc;..\..\InfantryFrame\Infantry\periph\Inc;..\..\InfantryFrame\Infantry\example\Inc;..\..\InfantryFrame\Infantry;..\..\InfantryFrame\RT-Thread\RealThread_RTOS\include;..\..\InfantryFrame\RT-Thread\RealThread_RTOS\finsh;..\..\InfantryFrame\RT-Thread\RealThread_RTOS\components\finsh;..\..\InfantryFrame\RT-Thread;..\..\InfantryFrame\DSP\Inc;..\App\Inc"
+        new_path = r"..\Infantry\algorithm\Inc;..\Infantry\device\Inc;..\Infantry\frame\Inc;..\Infantry\plugins\graph_task\Inc;..\Infantry\plugins\logger\Inc;..\Infantry\plugins\fsm\Inc;..\Infantry\library\Inc;..\Infantry\example\Inc;..\Infantry;..\RT-Thread\RealThread_RTOS\include;..\RT-Thread\RealThread_RTOS\finsh;..\RT-Thread\RealThread_RTOS\components\finsh;..\RT-Thread;..\DSP\Inc;..\App\Inc"
         include_path.text = (
             current_paths + ";" + new_path if current_paths else new_path
         )
@@ -33,7 +31,7 @@ def modifyIncludePath(project_name):
 
 
 def modifySourceGroup(project_name, group_list):
-    uvprojx = f"../{project_name}/MDK-ARM/{project_name}.uvprojx"
+    uvprojx = f"./MDK-ARM/{project_name}.uvprojx"
     tree = ET.parse(uvprojx)
     root = tree.getroot()
 
@@ -67,10 +65,10 @@ def modifySourceGroup(project_name, group_list):
     with open(uvprojx, "r") as file:
         data = file.read()
     data = data.replace(
-        """<FileName>SEGGER_RTT_ASM_ARMv7M.S</FileName><FileType>2</FileType><FilePath>..\..\InfantryFrame\Infantry\plugins\logger\Src\SEGGER_RTT_ASM_ARMv7M.S</FilePath>""",
+        """<FileName>SEGGER_RTT_ASM_ARMv7M.S</FileName><FileType>2</FileType><FilePath>..\Infantry\plugins\logger\Src\SEGGER_RTT_ASM_ARMv7M.S</FilePath>""",
         """<FileName>SEGGER_RTT_ASM_ARMv7M.S</FileName>
               <FileType>2</FileType>
-              <FilePath>..\..\InfantryFrame\Infantry\plugins\logger\Src\SEGGER_RTT_ASM_ARMv7M.S</FilePath>
+              <FilePath>..\Infantry\plugins\logger\Src\SEGGER_RTT_ASM_ARMv7M.S</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -115,9 +113,10 @@ def modifySourceGroup(project_name, group_list):
 
 
 def createCMakeList(project_name):
-    with open(f"../{project_name}/CMakeLists.txt", "w") as file:
+    with open("CMakeLists.txt", "w") as file:
         file.write(
-            r"""#THIS FILE IS AUTO GENERATED FROM THE TEMPLATE! DO NOT CHANGE!
+            r"""
+#THIS FILE IS AUTO GENERATED FROM THE TEMPLATE! DO NOT CHANGE!
 set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_SYSTEM_VERSION 1)
 cmake_minimum_required(VERSION 3.25)
@@ -217,65 +216,65 @@ set(CMAKE_C_STANDARD 99)
 #add_compile_options(-mfloat-abi=soft)
 
 include_directories(
-        ./Core/Inc
-        ./USB_Device/App
-        ./USB_Device/Target
-        ./Drivers/STM32G4xx_HAL_Driver/Inc
-        ./Drivers/STM32G4xx_HAL_Driver/Inc/Legacy
-        ./Middlewares/ST/STM32_USB_Device_Library/Core/Inc
-        ./Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc
-        ./Drivers/CMSIS/Device/ST/STM32G4xx/Include
-        ./Drivers/CMSIS/Include
+        Core/Inc
+        RT-Thread
+        USB_Device/App
+        USB_Device/Target
+        Drivers/STM32G4xx_HAL_Driver/Inc
+        Drivers/STM32G4xx_HAL_Driver/Inc/Legacy
+        Middlewares/ST/STM32_USB_Device_Library/Core/Inc
+        Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc
+        Drivers/CMSIS/Device/ST/STM32G4xx/Include
+        Drivers/CMSIS/Include
+        RT-Thread/RealThread_RTOS/include
+        RT-Thread/RealThread_RTOS/finsh
+        RT-Thread/RealThread_RTOS/components/finsh
+        DSP/Inc
         # 步兵框架
-        ../InfantryFrame/RT-Thread
-        ../InfantryFrame/RT-Thread/RealThread_RTOS/include
-        ../InfantryFrame/RT-Thread/RealThread_RTOS/finsh
-        ../InfantryFrame/RT-Thread/RealThread_RTOS/components/finsh
-        ../InfantryFrame/DSP/Inc
-        ../InfantryFrame/Infantry
-        ../InfantryFrame/Infantry/frame/Inc
-        ../InfantryFrame/Infantry/device/Inc
-        ../InfantryFrame/Infantry/algorithm/Inc
-        ../InfantryFrame/Infantry/library/Inc
-        ../InfantryFrame/Infantry/periph/Inc
-        ../InfantryFrame/Infantry/example/Inc
-        ../InfantryFrame/Infantry/plugins/logger/Inc
-        ../InfantryFrame/Infantry/plugins/graph_task/Inc
+        Infantry
+        Infantry/frame/Inc
+        Infantry/device/Inc
+        Infantry/algorithm/Inc
+        Infantry/library/Inc
+        Infantry/example/Inc
+        Infantry/plugins/logger/Inc
+        Infantry/plugins/graph_task/Inc
+        Infantry/plugins/fsm/Inc
         # 核心代码
-        ./App/Inc
-        ./Public/Inc
+        App/Inc
+        Public/Inc
+        # Example/Inc
 )
 
 add_definitions(-D__UVISION_VERSION="527" -D_RTE_ -DSTM32G473xx -DUSE_HAL_DRIVER -DSTM32G473xx -DARM_MATH_CM4 -D__TARGET_FPU_VFP -D__FPU_USED -D__FPU_PRESENT -DARM_MATH_MATRIX_CHECK -DARM_MATH_ROUNDING)
 
 file(GLOB_RECURSE SOURCES
-        "./Middlewares/*.*" "./Drivers/*.*" "./Core/*.*" "./USB_Device/*.*"
+        "RT-Thread/*.*" "Middlewares/*.*" "Drivers/*.*" "Core/*.*" "USB_Device/*.*"
+        "DSP/ARM/arm_cortexM4lf_math.lib"
         # 步兵框架
-        "../InfantryFrame/DSP/Src/*.*"
-        "../InfantryFrame/RT-Thread/*.*"
-        "../InfantryFrame/Infantry/algorithm/Src/*.*"./
-        "../InfantryFrame/Infantry/device/Src/*.*"
-        "../InfantryFrame/Infantry/frame/Src/*.*"
-        "../InfantryFrame/Infantry/library/Src/*.*"
-        "../InfantryFrame/Infantry/periph/Src/*.*"
-        "../InfantryFrame/Infantry/example/Src/*.*"
-        "../InfantryFrame/Infantry/plugins/logger/Src/*.*"
-        "../InfantryFrame/Infantry/plugins/graph_task/Src/*.*"
-        "./Public/*.*"./
-        "./App/Src/*.*"
-        "./Public/Src/*.*"
+        "Infantry/algorithm/Src/*.*"
+        "Infantry/device/Src/*.*"
+        "Infantry/frame/Src/*.*"
+        "Infantry/library/Src/*.*"
+        "Infantry/example/Src/*.*"
+        "Infantry/plugins/logger/Src/*.*"
+        "Infantry/plugins/graph_task/Src/*.*"
+        "Infantry/plugins/fsm/Src/*.*"
+        "Public/*.*"
+        "App/Src/*.*"
+        "Public/Src/*.*"
         # "Example/Src/*.* "
         )
 # 对于混合兼容的环境，需要屏蔽各种编译环境引起的文件“干扰”,通过 list(REMOVE_ITEM) 命令移除不同编译环境下的干扰文件
 # 在原来 CubeMX 自动生成的 gcc 编译环境目录上,附加 ARMCC 编译需要的文件
-file(GLOB_RECURSE SOURCES ${SOURCES} "${CMAKE_HOME_DIRECTORY}/MDK-ARM/startup_stm32g473xx.s")
+file(GLOB_RECURSE SOURCES ${SOURCES} " MDK-ARM/startup_stm32g473xx.s")
 # 将由 CubeMX 生成的 GCC 编译环境中的会干扰ARMCC环境的文件，放在 EXCLUDE_SRCS 自定义列表中
 file(GLOB_RECURSE EXCLUDE_SRCS
-        #                "./Middlewares/Third_Party/RealThread_RTOS/libcpu/arm/cortex-m4/context_gcc.S"
-        "./Core/Startup/*.*"
-        "./Core/Src/syscalls.c"
-        "./Core/Src/sysmem.c"
-        "./STM32G473CBTX_FLASH.ld "
+        #                "Middlewares/Third_Party/RealThread_RTOS/libcpu/arm/cortex-m4/context_gcc.S"
+        "Core/Startup/*.*"
+        "Core/Src/syscalls.c"
+        "Core/Src/sysmem.c"
+        "STM32G473CBTX_FLASH.ld "
         )
 # 从源文件列表(SOURCES)中剔除干扰文件(EXCLUDE_SRCS)
 list(REMOVE_ITEM SOURCES ${EXCLUDE_SRCS})
@@ -351,7 +350,7 @@ def remove_empty_lines(input_string):
 
 
 def createMain(project_name):
-    with open(f"../{project_name}/Core/Src/main.c", "r") as file:
+    with open("Core/Src/main.c", "r") as file:
         cMainData = file.read()
     includePattern = r"/\* Includes ------------------------------------------------------------------\*/\n((.|\n)*?)/\* Private includes"
     includeMatch = re.search(includePattern, cMainData).group(1).replace(" ", "")
@@ -411,20 +410,20 @@ void SysTick_Handler() {'{'}
 {timMatch}
 """
 
-    os.makedirs(os.path.dirname(f"../{project_name}/App/Src/main.cpp"), exist_ok=True)
-    os.makedirs(os.path.dirname(f"../{project_name}/App/Inc/main.h"), exist_ok=True)
-    os.remove(f"../{project_name}/Core/Src/main.c")
+    os.makedirs(os.path.dirname("App/Src/main.cpp"), exist_ok=True)
+    os.makedirs(os.path.dirname("App/Inc/main.h"), exist_ok=True)
+    os.remove("Core/Src/main.c")
 
-    with open(f"../{project_name}/App/Src/main.cpp", "w") as file:
+    with open("App/Src/main.cpp", "w") as file:
         file.write(cppMain)
 
-    with open(f"../{project_name}/Core/Inc/main.h", "r") as file:
+    with open("Core/Inc/main.h", "r") as file:
         mainH = file.read()
-    with open(f"../{project_name}/App/Inc/main.h", "w") as file:
+    with open("App/Inc/main.h", "w") as file:
         file.write(mainH)
-    os.remove(f"../{project_name}/Core/Inc/main.h")
+    os.remove("Core/Inc/main.h")
 
-    uvprojx = f"../{project_name}/MDK-ARM/{project_name}.uvprojx"
+    uvprojx = f"./MDK-ARM/{project_name}.uvprojx"
     with open(uvprojx, "r") as file:
         data = file.read()
     data = data.replace(
@@ -456,32 +455,32 @@ group = group_list = [
             {
                 "FileName": "infantry_pid_controller.cpp",
                 "FileType": "8",
-                "FilePath": "..\\..\\InfantryFrame\\Infantry\\algorithm\\Src\\infantry_pid_controller.cpp",
+                "FilePath": "..\\Infantry\\algorithm\\Src\\infantry_pid_controller.cpp",
             },
             {
                 "FileName": "infantry_quaternion_extended_kalman_filter.cpp",
                 "FileType": "8",
-                "FilePath": "..\\..\\InfantryFrame\\Infantry\\algorithm\\Src\\infantry_quaternion_extended_kalman_filter.cpp",
+                "FilePath": "..\\Infantry\\algorithm\\Src\\infantry_quaternion_extended_kalman_filter.cpp",
             },
             {
                 "FileName": "infantry_kalman.cpp",
                 "FileType": "8",
-                "FilePath": "..\\..\\InfantryFrame\\Infantry\\algorithm\\Src\\infantry_kalman.cpp",
+                "FilePath": "..\\Infantry\\algorithm\\Src\\infantry_kalman.cpp",
             },
             {
                 "FileName": "infantry_math.cpp",
                 "FileType": "8",
-                "FilePath": "..\\..\\InfantryFrame\\Infantry\\algorithm\\Src\\infantry_math.cpp",
+                "FilePath": "..\\Infantry\\algorithm\\Src\\infantry_math.cpp",
             },
             {
                 "FileName": "infantry_matrix.cpp",
                 "FileType": "8",
-                "FilePath": "..\\..\\InfantryFrame\\Infantry\\algorithm\\Src\\infantry_matrix.cpp",
+                "FilePath": "..\\Infantry\\algorithm\\Src\\infantry_matrix.cpp",
             },
             {
                 "FileName": "infantry_low_pass_filter.cpp",
                 "FileType": "8",
-                "FilePath": "..\\..\\InfantryFrame\\Infantry\\algorithm\\Src\\infantry_low_pass_filter.cpp",
+                "FilePath": "..\\Infantry\\algorithm\\Src\\infantry_low_pass_filter.cpp",
             },
         ],
     },
@@ -491,32 +490,32 @@ group = group_list = [
             {
                 "FileName": "infantry_device_list.cpp",
                 "FileType": "8",
-                "FilePath": "..\\..\\InfantryFrame\\Infantry\\device\\Src\\infantry_device_list.cpp",
+                "FilePath": "..\\Infantry\\device\\Src\\infantry_device_list.cpp",
             },
             {
                 "FileName": "infantry_fdcan_device.cpp",
                 "FileType": "8",
-                "FilePath": "..\\..\\InfantryFrame\\Infantry\\device\\Src\\infantry_fdcan_device.cpp",
+                "FilePath": "..\\Infantry\\device\\Src\\infantry_fdcan_device.cpp",
             },
             {
                 "FileName": "infantry_pwm_device.cpp",
                 "FileType": "8",
-                "FilePath": "..\\..\\InfantryFrame\\Infantry\\device\\Src\\infantry_pwm_device.cpp",
+                "FilePath": "..\\Infantry\\device\\Src\\infantry_pwm_device.cpp",
             },
             {
                 "FileName": "infantry_usart_device.cpp",
                 "FileType": "8",
-                "FilePath": "..\\..\\InfantryFrame\\Infantry\\device\\Src\\infantry_usart_device.cpp",
+                "FilePath": "..\\Infantry\\device\\Src\\infantry_usart_device.cpp",
             },
             {
                 "FileName": "infantry_gpio_device.cpp",
                 "FileType": "8",
-                "FilePath": "..\\..\\InfantryFrame\\Infantry\\device\\Src\\infantry_gpio_device.cpp",
+                "FilePath": "..\\Infantry\\device\\Src\\infantry_gpio_device.cpp",
             },
             {
                 "FileName": "infantry_spi_device.cpp",
                 "FileType": "8",
-                "FilePath": "..\\..\\InfantryFrame\\Infantry\\device\\Src\\infantry_spi_device.cpp",
+                "FilePath": "..\\Infantry\\device\\Src\\infantry_spi_device.cpp",
             },
         ],
     },
@@ -526,47 +525,47 @@ group = group_list = [
             {
                 "FileName": "infantry_board.cpp",
                 "FileType": "8",
-                "FilePath": "..\\..\\InfantryFrame\\Infantry\\frame\\Src\\infantry_board.cpp",
+                "FilePath": "..\\Infantry\\frame\\Src\\infantry_board.cpp",
             },
             {
                 "FileName": "infantry_cplus.cpp",
                 "FileType": "8",
-                "FilePath": "..\\..\\InfantryFrame\\Infantry\\frame\\Src\\infantry_cplus.cpp",
+                "FilePath": "..\\Infantry\\frame\\Src\\infantry_cplus.cpp",
             },
             {
                 "FileName": "infantry_event.cpp",
                 "FileType": "8",
-                "FilePath": "..\\..\\InfantryFrame\\Infantry\\frame\\Src\\infantry_event.cpp",
+                "FilePath": "..\\Infantry\\frame\\Src\\infantry_event.cpp",
             },
             {
                 "FileName": "infantry_fsm.cpp",
                 "FileType": "8",
-                "FilePath": "..\\..\\InfantryFrame\\Infantry\\frame\\Src\\infantry_fsm.cpp",
+                "FilePath": "..\\Infantry\\frame\\Src\\infantry_fsm.cpp",
             },
             {
                 "FileName": "infantry_mailbox.cpp",
                 "FileType": "8",
-                "FilePath": "..\\..\\InfantryFrame\\Infantry\\frame\\Src\\infantry_mailbox.cpp",
+                "FilePath": "..\\Infantry\\frame\\Src\\infantry_mailbox.cpp",
             },
             {
                 "FileName": "infantry_messagequeue.cpp",
                 "FileType": "8",
-                "FilePath": "..\\..\\InfantryFrame\\Infantry\\frame\\Src\\infantry_messagequeue.cpp",
+                "FilePath": "..\\Infantry\\frame\\Src\\infantry_messagequeue.cpp",
             },
             {
                 "FileName": "infantry_mutex.cpp",
                 "FileType": "8",
-                "FilePath": "..\\..\\InfantryFrame\\Infantry\\frame\\Src\\infantry_mutex.cpp",
+                "FilePath": "..\\Infantry\\frame\\Src\\infantry_mutex.cpp",
             },
             {
                 "FileName": "infantry_sem.cpp",
                 "FileType": "8",
-                "FilePath": "..\\..\\InfantryFrame\\Infantry\\frame\\Src\\infantry_sem.cpp",
+                "FilePath": "..\\Infantry\\frame\\Src\\infantry_sem.cpp",
             },
             {
                 "FileName": "infantry_thread.cpp",
                 "FileType": "8",
-                "FilePath": "..\\..\\InfantryFrame\\Infantry\\frame\\Src\\infantry_thread.cpp",
+                "FilePath": "..\\Infantry\\frame\\Src\\infantry_thread.cpp",
             },
         ],
     },
@@ -576,52 +575,52 @@ group = group_list = [
             {
                 "FileName": "elog.c",
                 "FileType": "1",
-                "FilePath": "..\\..\\InfantryFrame\\Infantry\\plugins\\logger\\Src\\elog.c",
+                "FilePath": "..\\Infantry\\plugins\\logger\\Src\\elog.c",
             },
             {
                 "FileName": "elog_async.c",
                 "FileType": "1",
-                "FilePath": "..\\..\\InfantryFrame\\Infantry\\plugins\\logger\\Src\\elog_async.c",
+                "FilePath": "..\\Infantry\\plugins\\logger\\Src\\elog_async.c",
             },
             {
                 "FileName": "elog_buf.c",
                 "FileType": "1",
-                "FilePath": "..\\..\\InfantryFrame\\Infantry\\plugins\\logger\\Src\\elog_buf.c",
+                "FilePath": "..\\Infantry\\plugins\\logger\\Src\\elog_buf.c",
             },
             {
                 "FileName": "elog_port.c",
                 "FileType": "1",
-                "FilePath": "..\\..\\InfantryFrame\\Infantry\\plugins\\logger\\Src\\elog_port.c",
+                "FilePath": "..\\Infantry\\plugins\\logger\\Src\\elog_port.c",
             },
             {
                 "FileName": "elog_utils.c",
                 "FileType": "1",
-                "FilePath": "..\\..\\InfantryFrame\\Infantry\\plugins\\logger\\Src\\elog_utils.c",
+                "FilePath": "..\\Infantry\\plugins\\logger\\Src\\elog_utils.c",
             },
             {
                 "FileName": "infantry_log.cpp",
                 "FileType": "8",
-                "FilePath": "..\\..\\InfantryFrame\\Infantry\\plugins\\logger\\Src\\infantry_log.cpp",
+                "FilePath": "..\\Infantry\\plugins\\logger\\Src\\infantry_log.cpp",
             },
             {
                 "FileName": "SEGGER_RTT.c",
                 "FileType": "1",
-                "FilePath": "..\\..\\InfantryFrame\\Infantry\\plugins\\logger\\Src\\SEGGER_RTT.c",
+                "FilePath": "..\\Infantry\\plugins\\logger\\Src\\SEGGER_RTT.c",
             },
             {
                 "FileName": "SEGGER_RTT_ASM_ARMv7M.S",
                 "FileType": "2",
-                "FilePath": "..\\..\\InfantryFrame\\Infantry\\plugins\\logger\\Src\\SEGGER_RTT_ASM_ARMv7M.S",
+                "FilePath": "..\Infantry\plugins\logger\Src\SEGGER_RTT_ASM_ARMv7M.S",
             },
             {
                 "FileName": "SEGGER_RTT_printf.c",
                 "FileType": "1",
-                "FilePath": "..\\..\\InfantryFrame\\Infantry\\plugins\\logger\\Src\\SEGGER_RTT_printf.c",
+                "FilePath": "..\\Infantry\\plugins\\logger\\Src\\SEGGER_RTT_printf.c",
             },
             {
                 "FileName": "SEGGER_RTT_Syscalls_KEIL.c",
                 "FileType": "1",
-                "FilePath": "..\\..\\InfantryFrame\\Infantry\\plugins\\logger\\Src\\SEGGER_RTT_Syscalls_KEIL.c",
+                "FilePath": "..\\Infantry\\plugins\\logger\\Src\\SEGGER_RTT_Syscalls_KEIL.c",
             },
         ],
     },
@@ -631,12 +630,22 @@ group = group_list = [
             {
                 "FileName": "infantry_graph.cpp",
                 "FileType": "8",
-                "FilePath": "..\\..\\InfantryFrame\\Infantry\\plugins\\graph_task\\Src\\infantry_graph.cpp",
+                "FilePath": "..\\Infantry\\plugins\\graph_task\\Src\\infantry_graph.cpp",
             },
             {
                 "FileName": "infantry_task.cpp",
                 "FileType": "8",
-                "FilePath": "..\\..\\InfantryFrame\\Infantry\\plugins\\graph_task\\Src\\infantry_task.cpp",
+                "FilePath": "..\\Infantry\\plugins\\graph_task\\Src\\infantry_task.cpp",
+            },
+        ],
+    },
+    {
+        "GroupName": "Infantry/fsm",
+        "Files": [
+            {
+                "FileName": "infantry_finite_state_machine.c",
+                "FileType": "8",
+                "FilePath": "..\\Infantry\\plugins\\fsm\\Src\\infantry_finite_state_machine.c",
             },
         ],
     },
@@ -646,7 +655,7 @@ group = group_list = [
             {
                 "FileName": "infantry_dwt_lib.cpp",
                 "FileType": "8",
-                "FilePath": "..\\..\\InfantryFrame\\Infantry\\library\\Src\\infantry_dwt_lib.cpp",
+                "FilePath": "..\\Infantry\\library\\Src\\infantry_dwt_lib.cpp",
             },
         ],
     },
@@ -656,22 +665,17 @@ group = group_list = [
             {
                 "FileName": "bmi088.cpp",
                 "FileType": "8",
-                "FilePath": "..\\..\\InfantryFrame\\Infantry\\example\\Src\\bmi088.cpp",
+                "FilePath": "..\\Infantry\\example\\Src\\bmi088.cpp",
             },
             {
                 "FileName": "motor.cpp",
                 "FileType": "8",
-                "FilePath": "..\\..\\InfantryFrame\\Infantry\\example\\Src\\motor.cpp",
+                "FilePath": "..\\Infantry\\example\\Src\\motor.cpp",
             },
-        ],
-    },
-    {
-        "GroupName": "Infantry/periph",
-        "Files": [
             {
                 "FileName": "infantry_ins.cpp",
                 "FileType": "8",
-                "FilePath": "..\\..\\InfantryFrame\\Infantry\\periph\\Src\\infantry_ins.cpp",
+                "FilePath": "..\\Infantry\\example\\Src\\infantry_ins.cpp",
             },
         ],
     },
@@ -681,87 +685,87 @@ group = group_list = [
             {
                 "FileName": "context_rvds.S",
                 "FileType": "2",
-                "FilePath": "..\\..\\InfantryFrame\\RT-Thread\\RealThread_RTOS\\libcpu\\arm\\cortex-m4\\context_rvds.S",
+                "FilePath": "..\\RT-Thread\\RealThread_RTOS\\libcpu\\arm\\cortex-m4\\context_rvds.S",
             },
             {
                 "FileName": "cpuport.c",
                 "FileType": "1",
-                "FilePath": "..\\..\\InfantryFrame\\RT-Thread\\RealThread_RTOS\\libcpu\\arm\\cortex-m4\\cpuport.c",
+                "FilePath": "..\\RT-Thread\\RealThread_RTOS\\libcpu\\arm\\cortex-m4\\cpuport.c",
             },
             {
                 "FileName": "clock.c",
                 "FileType": "1",
-                "FilePath": "..\\..\\InfantryFrame\\RT-Thread\\RealThread_RTOS\\src\\clock.c",
+                "FilePath": "..\\RT-Thread\\RealThread_RTOS\\src\\clock.c",
             },
             {
                 "FileName": "components.c",
                 "FileType": "1",
-                "FilePath": "..\\..\\InfantryFrame\\RT-Thread\\RealThread_RTOS\\src\\components.c",
+                "FilePath": "..\\RT-Thread\\RealThread_RTOS\\src\\components.c",
             },
             {
                 "FileName": "cpu.c",
                 "FileType": "1",
-                "FilePath": "..\\..\\InfantryFrame\\RT-Thread\\RealThread_RTOS\\src\\cpu.c",
+                "FilePath": "..\\RT-Thread\\RealThread_RTOS\\src\\cpu.c",
             },
             {
                 "FileName": "idle.c",
                 "FileType": "1",
-                "FilePath": "..\\..\\InfantryFrame\\RT-Thread\\RealThread_RTOS\\src\\idle.c",
+                "FilePath": "..\\RT-Thread\\RealThread_RTOS\\src\\idle.c",
             },
             {
                 "FileName": "ipc.c",
                 "FileType": "1",
-                "FilePath": "..\\..\\InfantryFrame\\RT-Thread\\RealThread_RTOS\\src\\ipc.c",
+                "FilePath": "..\\RT-Thread\\RealThread_RTOS\\src\\ipc.c",
             },
             {
                 "FileName": "irq.c",
                 "FileType": "1",
-                "FilePath": "..\\..\\InfantryFrame\\RT-Thread\\RealThread_RTOS\\src\\irq.c",
+                "FilePath": "..\\RT-Thread\\RealThread_RTOS\\src\\irq.c",
             },
             {
                 "FileName": "kservice.c",
                 "FileType": "1",
-                "FilePath": "..\\..\\InfantryFrame\\RT-Thread\\RealThread_RTOS\\src\\kservice.c",
+                "FilePath": "..\\RT-Thread\\RealThread_RTOS\\src\\kservice.c",
             },
             {
                 "FileName": "mem.c",
                 "FileType": "1",
-                "FilePath": "..\\..\\InfantryFrame\\RT-Thread\\RealThread_RTOS\\src\\mem.c",
+                "FilePath": "..\\RT-Thread\\RealThread_RTOS\\src\\mem.c",
             },
             {
                 "FileName": "memheap.c",
                 "FileType": "1",
-                "FilePath": "..\\..\\InfantryFrame\\RT-Thread\\RealThread_RTOS\\src\\memheap.c",
+                "FilePath": "..\\RT-Thread\\RealThread_RTOS\\src\\memheap.c",
             },
             {
                 "FileName": "mempool.c",
                 "FileType": "1",
-                "FilePath": "..\\..\\InfantryFrame\\RT-Thread\\RealThread_RTOS\\src\\mempool.c",
+                "FilePath": "..\\RT-Thread\\RealThread_RTOS\\src\\mempool.c",
             },
             {
                 "FileName": "object.c",
                 "FileType": "1",
-                "FilePath": "..\\..\\InfantryFrame\\RT-Thread\\RealThread_RTOS\\src\\object.c",
+                "FilePath": "..\\RT-Thread\\RealThread_RTOS\\src\\object.c",
             },
             {
                 "FileName": "scheduler.c",
                 "FileType": "1",
-                "FilePath": "..\\..\\InfantryFrame\\RT-Thread\\RealThread_RTOS\\src\\scheduler.c",
+                "FilePath": "..\\RT-Thread\\RealThread_RTOS\\src\\scheduler.c",
             },
             {
                 "FileName": "slab.c",
                 "FileType": "1",
-                "FilePath": "..\\..\\InfantryFrame\\RT-Thread\\RealThread_RTOS\\src\\slab.c",
+                "FilePath": "..\\RT-Thread\\RealThread_RTOS\\src\\slab.c",
             },
             {
                 "FileName": "thread.c",
                 "FileType": "1",
-                "FilePath": "..\\..\\InfantryFrame\\RT-Thread\\RealThread_RTOS\\src\\thread.c",
+                "FilePath": "..\\RT-Thread\\RealThread_RTOS\\src\\thread.c",
             },
             {
                 "FileName": "timer.c",
                 "FileType": "1",
-                "FilePath": "..\\..\\InfantryFrame\\RT-Thread\\RealThread_RTOS\\src\\timer.c",
+                "FilePath": "..\\RT-Thread\\RealThread_RTOS\\src\\timer.c",
             },
         ],
     },
@@ -771,22 +775,22 @@ group = group_list = [
             {
                 "FileName": "cmd.c",
                 "FileType": "1",
-                "FilePath": "..\\..\\InfantryFrame\\RT-Thread\\RealThread_RTOS\\components\\finsh\\cmd.c",
+                "FilePath": "..\\RT-Thread\\RealThread_RTOS\\components\\finsh\\cmd.c",
             },
             {
                 "FileName": "finsh_port.c",
                 "FileType": "1",
-                "FilePath": "..\\..\\InfantryFrame\\RT-Thread\\RealThread_RTOS\\components\\finsh\\finsh_port.c",
+                "FilePath": "..\\RT-Thread\\RealThread_RTOS\\components\\finsh\\finsh_port.c",
             },
             {
                 "FileName": "msh.c",
                 "FileType": "1",
-                "FilePath": "..\\..\\InfantryFrame\\RT-Thread\\RealThread_RTOS\\components\\finsh\\msh.c",
+                "FilePath": "..\\RT-Thread\\RealThread_RTOS\\components\\finsh\\msh.c",
             },
             {
                 "FileName": "shell.c",
                 "FileType": "1",
-                "FilePath": "..\\..\\InfantryFrame\\RT-Thread\\RealThread_RTOS\\components\\finsh\\shell.c",
+                "FilePath": "..\\RT-Thread\\RealThread_RTOS\\components\\finsh\\shell.c",
             },
         ],
     },
@@ -796,7 +800,7 @@ group = group_list = [
             {
                 "FileName": "arm_cortexM4lf_math.lib",
                 "FileType": "4",
-                "FilePath": "..\\..\\InfantryFrame\\DSP\\ARM\\arm_cortexM4lf_math.lib",
+                "FilePath": "..\\DSP\\ARM\\arm_cortexM4lf_math.lib",
             },
         ],
     },
@@ -804,6 +808,10 @@ group = group_list = [
 
 if __name__ == "__main__":
     if len(sys.argv) == 3 and sys.argv[1] == "init":
+        os.symlink("..\InfantryFrame\DSP", f"..\{sys.argv[2]}\DSP")
+        os.symlink("..\InfantryFrame\Infantry", f"..\{sys.argv[2]}\Infantry")
+        os.symlink("..\InfantryFrame\RT-Thread", f"..\{sys.argv[2]}\RT-Thread")
+        os.chdir(f"..\{sys.argv[2]}")
         modifyOption(sys.argv[2])
         modifyIncludePath(sys.argv[2])
         modifySourceGroup(sys.argv[2], group)
