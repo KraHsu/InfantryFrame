@@ -17,6 +17,7 @@
 
 #include "device/Inc/infantry_usart_device.h"
 #include "infantry_log.h"
+#include "referee.h"
 
 namespace infantry {
     UsartRxDataType *UsartDeviceRxDataMap[3]{nullptr};

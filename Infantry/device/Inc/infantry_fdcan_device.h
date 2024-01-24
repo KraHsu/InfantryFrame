@@ -61,9 +61,9 @@ namespace infantry {
 
         explicit FdcanDataType(FDCAN_HandleTypeDef *ph_fdcan);
 
-        virtual ~FdcanDataType() = default;
+        virtual ~FdcanDataType( ) = default;
 
-        virtual FdcanDataType *init();
+        virtual FdcanDataType *init( );
     };
 
     class FdcanRxDataType : public FdcanDataType {
@@ -85,11 +85,15 @@ namespace infantry {
 
         FdcanTxDataType(FDCAN_HandleTypeDef *ph_fdcan, FDCAN_TxHeaderTypeDef header, uint16_t buffer_size);
 
-        FdcanTxDataType *init() override;
+        FdcanTxDataType(
+            FDCAN_HandleTypeDef *ph_fdcan, FDCAN_TxHeaderTypeDef header, uint16_t buffer_size, uint8_t *buffer
+        );
 
-        ~FdcanTxDataType() override;
+        FdcanTxDataType *init( ) override;
 
-        virtual FdcanTxDataType *txHook() = 0;
+        ~FdcanTxDataType( ) override;
+
+        virtual FdcanTxDataType *txHook( ) = 0;
     };
 
     class FdcanDevice {
@@ -99,14 +103,14 @@ namespace infantry {
     public:
         FdcanDevice(FdcanRxDataType *rx_data, FdcanTxDataType *tx_data);
 
-        virtual ~FdcanDevice();
+        virtual ~FdcanDevice( );
 
-        virtual FdcanDevice *init();
+        virtual FdcanDevice *init( );
 
-        virtual FdcanDevice *registerRxCallback();
+        virtual FdcanDevice *registerRxCallback( );
 
-        virtual FdcanDevice *transmit();
+        virtual FdcanDevice *transmit( );
 
-        virtual FdcanDevice *process();
+        virtual FdcanDevice *process( );
     };
 } // namespace infantry

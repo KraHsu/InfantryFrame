@@ -34,21 +34,21 @@
 namespace infantry {
 
     PIDController::PIDController(
-            float kp, float ki, float kd, float sum_max, float output_max, float kd_fil_param, float delta_fil_param,
-            float kf_1_param, float kf_2_param, float kf1_fil_param, float kf2_fil_param,
-            PIDController::ModeEnum pid_mode
+        float kp, float ki, float kd, float sum_max, float output_max, float kd_fil_param, float delta_fil_param,
+        float kf_1_param, float kf_2_param, float kf1_fil_param, float kf2_fil_param,
+        PIDController::ModeEnum pid_mode
     ) : _mode{pid_mode}, _kp{kp}, _ki{ki}, _kd{kd}, _sum_max{sum_max}, _output_max{output_max}, _kd_fil(kd_fil_param),
         _delta_fil(delta_fil_param), _kf_1{kf_1_param}, _kf_2{kf_2_param}, _kf1_fil(kf1_fil_param),
         _kf2_fil(kf2_fil_param) {}
 
     PIDController::PIDController(PIDController::InitialType initial_struct, PIDController::ModeEnum pid_mode)
-            : PIDController(
-            initial_struct.Kp, initial_struct.Ki, initial_struct.Kd, initial_struct.SumMax, initial_struct.OutputMax,
-            initial_struct.KdFilterParam, initial_struct.DeltaFilterParam, initial_struct.Kf1Param,
-            initial_struct.Kf2Param, initial_struct.Kf1FilterParam, initial_struct.Kf2FilterParam, pid_mode
+        : PIDController(
+        initial_struct.Kp, initial_struct.Ki, initial_struct.Kd, initial_struct.SumMax, initial_struct.OutputMax,
+        initial_struct.KdFilterParam, initial_struct.DeltaFilterParam, initial_struct.Kf1Param,
+        initial_struct.Kf2Param, initial_struct.Kf1FilterParam, initial_struct.Kf2FilterParam, pid_mode
     ) {}
-
-    float PIDController::getReference() const {
+    
+    float PIDController::getReference( ) const {
         return _reference;
     }
 
@@ -62,7 +62,7 @@ namespace infantry {
         return this;
     }
 
-    float PIDController::getFeedback() const {
+    float PIDController::getFeedback( ) const {
         return _feedback;
     }
 
@@ -71,7 +71,7 @@ namespace infantry {
         return this;
     }
 
-    float PIDController::calculate() {
+    float PIDController::calculate( ) {
         if (_mode == POSITION) {
             float dError, Error, ref_dError, ref_ddError;
 
@@ -146,7 +146,7 @@ namespace infantry {
         return _output;
     }
 
-    PIDController *PIDController::clear() {
+    PIDController *PIDController::clear( ) {
         _reference = 0;
         _feedback = 0;
         _err[0] = 0;

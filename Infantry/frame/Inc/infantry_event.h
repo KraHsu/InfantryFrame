@@ -48,16 +48,39 @@
 
 #pragma once
 
+#include "main.h"
 #include "rtthread.h"
+#include "preprocessor.hpp"
+
+#define DECLARE_EVENTS(index, name, event) BOOST_PP_IF(BOOST_PP_SUB(index, 1), BOOST_PP_COMMA, BOOST_PP_EMPTY)() \
+event = 1u << BOOST_PP_SUB(index, 1)
+
+#define DECLARE_STATIC_EVENTS(NAME, ...) \
+BOOST_PP_IF( \
+    BOOST_PP_GREATER(BOOST_PP_SEQ_SIZE(BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__)), 32), \
+    "#error : The maximum number of events is 32!", \
+    BOOST_PP_EMPTY() \
+) \
+enum class NAME##Events : uint32_t { \
+        BOOST_PP_SEQ_FOR_EACH(DECLARE_EVENTS, NAME, BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__))\
+}; \
+extern infantry::StaticEvent NAME
+
+#define DEFINE_STATIC_EVENTS(NAME) infantry::StaticEvent NAME
+
+#define GET_EVENTS_INNER(index, name, event) BOOST_PP_IF(BOOST_PP_SUB(index, 1), |, BOOST_PP_EMPTY()) \
+static_cast<uint32_t>(name##Events::event)
+#define GET_EVENTS(NAME, ...) \
+BOOST_PP_SEQ_FOR_EACH(GET_EVENTS_INNER, NAME, BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__)) // NOLINT
 
 namespace infantry {
     class StaticEvent {
     private:
         rt_event _event;
     public:
-        StaticEvent() = default;
+        StaticEvent( ) = default;
 
-        ~StaticEvent();
+        ~StaticEvent( );
 
         /**
          * @brief 初始化事件集
@@ -93,7 +116,7 @@ namespace infantry {
     public:
         DynamicEvent(const char *name, rt_uint8_t flag);
 
-        ~DynamicEvent();
+        ~DynamicEvent( );
 
         /**
          * @brief 发送事件集中的一个或多个事件

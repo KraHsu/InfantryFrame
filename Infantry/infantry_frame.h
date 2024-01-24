@@ -54,4 +54,3 @@
 
 #include "plugins/logger/Inc/infantry_log.h"
 #include "plugins/graph_task/Inc/infantry_graph.h"
-#include "plugins/fsm/Inc/infantry_finite_state_machine_template.hpp"

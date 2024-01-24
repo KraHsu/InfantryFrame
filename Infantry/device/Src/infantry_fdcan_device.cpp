@@ -31,7 +31,7 @@ namespace infantry {
         }
     }
 
-    [[noreturn]] void FDCAN_ErrorHandler() {
+    [[noreturn]] void FDCAN_ErrorHandler( ) {
         while (true) {
             // return;
         }
@@ -43,7 +43,7 @@ namespace infantry {
                 FDCAN_ErrorHandler();
             }
             HAL_FDCAN_ConfigTxDelayCompensation(
-                    ph_fdcan, ph_fdcan->Init.DataPrescaler * ph_fdcan->Init.DataTimeSeg1, 0
+                ph_fdcan, ph_fdcan->Init.DataPrescaler * ph_fdcan->Init.DataTimeSeg1, 0
             );
             HAL_FDCAN_EnableTxDelayCompensation(ph_fdcan);
         }
@@ -59,7 +59,7 @@ namespace infantry {
             FDCAN_ErrorHandler();
         }
         if (HAL_FDCAN_ConfigGlobalFilter(
-                ph_fdcan, FDCAN_REJECT, FDCAN_REJECT, FDCAN_FILTER_REMOTE, FDCAN_FILTER_REMOTE) != HAL_OK) {
+            ph_fdcan, FDCAN_REJECT, FDCAN_REJECT, FDCAN_FILTER_REMOTE, FDCAN_FILTER_REMOTE) != HAL_OK) {
             FDCAN_ErrorHandler();
         }
         if (HAL_FDCAN_Start(ph_fdcan) != HAL_OK) {
@@ -80,19 +80,19 @@ namespace infantry {
 namespace infantry {
     FdcanDataType::FdcanDataType(FDCAN_HandleTypeDef *ph_fdcan) : _ph_fdcan{ph_fdcan} {}
 
-    FdcanDataType *FdcanDataType::init() {
+    FdcanDataType *FdcanDataType::init( ) {
         return this;
     }
 
     FdcanDevice::FdcanDevice(FdcanRxDataType *rx_data, FdcanTxDataType *tx_data)
-            : _rx_data{rx_data}, _tx_data{tx_data} {}
+        : _rx_data{rx_data}, _tx_data{tx_data} {}
 
-    FdcanDevice::~FdcanDevice() {
+    FdcanDevice::~FdcanDevice( ) {
         delete _rx_data;
         delete _tx_data;
     }
 
-    FdcanDevice *FdcanDevice::init() {
+    FdcanDevice *FdcanDevice::init( ) {
         if (_rx_data != nullptr) {
             _rx_data->init();
         }
@@ -102,7 +102,7 @@ namespace infantry {
         return this;
     }
 
-    FdcanDevice *FdcanDevice::registerRxCallback() {
+    FdcanDevice *FdcanDevice::registerRxCallback( ) {
         if (_rx_data == nullptr) {
             FdcanErrorHandler("Cannot register a receive callback function when the receive data type is null");
         }
@@ -116,16 +116,16 @@ namespace infantry {
         return this;
     }
 
-    FdcanDevice *FdcanDevice::transmit() {
+    FdcanDevice *FdcanDevice::transmit( ) {
         if (_tx_data == nullptr) {
             FdcanErrorHandler("Data cannot be sent if the send data type is null");
         }
         _tx_data->txHook();
         auto res = HAL_FDCAN_AddMessageToTxFifoQ(_tx_data->_ph_fdcan, &_tx_data->_header, _tx_data->_buffer);
         if (res != HAL_OK) {
-            logErrorWithTag("fdcan", "Data sending failure");
+//            logErrorWithTag("fdcan", "Data sending failure");
             if (_tx_data->_ph_fdcan->ErrorCode | HAL_FDCAN_ERROR_FIFO_FULL) {
-                logErrorWithTag("fdcan", "FDCAN_ERROR_TX_FIFO_FULL");
+//                logErrorWithTag("fdcan", "FDCAN_ERROR_TX_FIFO_FULL");
 //                HAL_FDCAN_Stop(_tx_data->_ph_fdcan);
 //                _tx_data->_ph_fdcan->Instance->TXFQS = 0x03;
 //                HAL_FDCAN_Start(_tx_data->_ph_fdcan);
@@ -134,24 +134,30 @@ namespace infantry {
         return this;
     }
 
-    FdcanDevice *FdcanDevice::process() {
+    FdcanDevice *FdcanDevice::process( ) {
         return this;
     }
 
     FdcanTxDataType::FdcanTxDataType(FDCAN_HandleTypeDef *ph_fdcan, FDCAN_TxHeaderTypeDef header, uint16_t buffer_size)
-            : FdcanDataType(ph_fdcan), _header{header}, _buffer_size{buffer_size} {}
+        : FdcanDataType(ph_fdcan), _header{header}, _buffer_size{buffer_size} {}
 
-    FdcanTxDataType *FdcanTxDataType::init() {
-        _buffer = new uint8_t[_buffer_size];
+    FdcanTxDataType::FdcanTxDataType(
+        FDCAN_HandleTypeDef *ph_fdcan, FDCAN_TxHeaderTypeDef header, uint16_t buffer_size, uint8_t *buffer
+    ) : FdcanDataType(ph_fdcan), _header{header}, _buffer_size{buffer_size}, _buffer{buffer} {}
+
+    FdcanTxDataType *FdcanTxDataType::init( ) {
+        if (_buffer == nullptr) {
+            _buffer = new uint8_t[_buffer_size];
+        }
         return this;
     }
 
-    FdcanTxDataType::~FdcanTxDataType() {
+    FdcanTxDataType::~FdcanTxDataType( ) {
         delete[] _buffer;
     }
 
     FdcanRxDataType::FdcanRxDataType(FDCAN_HandleTypeDef *ph_fdcan, uint32_t std_id)
-            : FdcanDataType(ph_fdcan), stdID{std_id} {}
+        : FdcanDataType(ph_fdcan), stdID{std_id} {}
 }
 
 /* Interrupt callback */

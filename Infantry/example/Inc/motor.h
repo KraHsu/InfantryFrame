@@ -61,7 +61,6 @@ namespace infantry {
         using AngleType = struct {
             int16_t last_angle;
             int16_t round_count;
-            int8_t has_init;  // Initial flag of the plucking wheel
             float init_offset;
             float limited_angle;
             float consequent_angle;
@@ -73,9 +72,24 @@ namespace infantry {
 
         using FdcanDevice::FdcanDevice;
 
+        Motor *setReference(float reference) override {
+            return this;
+        };
+
+        Motor *update() override {
+            return this;
+        };
+
+        Motor *control() override {
+            transmit();
+            return this;
+        };
+
         AngleType *getAnglePtr();
 
         EncoderType *getEncoderPtr();
+
+        DjMotor *setOutput(int16_t output);
     };
 
     class DjMotor::RxData : public FdcanRxDataType {
@@ -98,51 +112,9 @@ namespace infantry {
     public:
         friend class DjMotor;
 
-        TxData(FDCAN_HandleTypeDef *ph_fdcan, FDCAN_TxHeaderTypeDef header, uint8_t motor_id);
+        TxData(FDCAN_HandleTypeDef *ph_fdcan, uint32_t can_id, uint8_t motor_id, uint8_t* buffer = nullptr);
 
         TxData *txHook() override;
-    };
-}
-
-/* PositionMotor */
-namespace infantry {
-    class PositionMotor final : public DjMotor {
-    public:
-        using PidFdbIndex = enum {
-            CurrentPid = 0,
-            SpeedPid = 1,
-            PositionPid = 2,
-        };
-    private:
-        PIDController *_pid_cur, *_pid_spd, *_pid_pos;
-        const float *_pid_fdb_ptr[3]{nullptr};
-    public:
-        class RxData final : public DjMotor::RxData {
-        public:
-            friend class PositionMotor;
-
-            using DjMotor::RxData::RxData;
-        };
-
-        class TxData final : public DjMotor::TxData {
-        public:
-            friend class PositionMotor;
-
-            using DjMotor::TxData::TxData;
-        };
-
-        PositionMotor(
-                RxData *rx_data, TxData *tx_data, PIDController *current_pid, PIDController *speed_pid,
-                PIDController *position_pid
-        );
-
-        PositionMotor *setReference(float reference) override;
-
-        PositionMotor *setFdbPtr(const float *currentPtr,const float *speedPtr,const float *positionPtr);
-
-        PositionMotor *update() override;
-
-        PositionMotor *control() override;
     };
 }
 
